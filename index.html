@@ -70,7 +70,7 @@ img{max-width:100%;display:block}
 .ok-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:7px;vertical-align:middle}
 header.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:linear-gradient(180deg,#0E1B2E,#0A1626);border-bottom:1px solid rgba(255,255,255,.08);transition:box-shadow .2s}
 header.nav.scrolled{box-shadow:var(--shadow-sm)}
-.nav .wrap{display:flex;align-items:center;gap:22px;padding-block:13px}
+.nav .wrap{display:flex;align-items:center;gap:22px;padding-block:9px}
 .brand{display:flex;align-items:center;gap:11px;flex-shrink:0}
 .brand .mark{width:40px;height:40px;flex-shrink:0}
 .brand .bt{font-family:var(--display);font-weight:800;font-size:1.26rem;letter-spacing:.01em;line-height:1;color:var(--ink)}
@@ -86,8 +86,9 @@ nav.menu a:hover{color:#fff;background:rgba(255,255,255,.08)}
 #navPanel a{color:#EAF1FB}
 header.nav .icon-btn{border-color:rgba(255,255,255,.2);color:#EAF1FB}
 header.nav .icon-btn:hover{border-color:#fff;color:#fff}
-.navlogo{height:40px;width:auto;display:block}
-.flogo{height:54px;width:auto;display:block;margin-bottom:14px}
+.navlogo{height:58px;width:auto;display:block}
+.flogo{height:90px;width:auto;display:block;margin-bottom:16px}
+@media(max-width:480px){.navlogo{height:46px}.flogo{height:72px}}
 .hero{position:relative;min-height:clamp(500px,72vh,660px);display:flex;align-items:center;overflow:hidden;background:var(--band-2)}
 .hero-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:60% 38%;z-index:0}
 .hero-scrim{position:absolute;inset:0;z-index:1;background:linear-gradient(100deg,rgba(8,16,30,.94) 0%,rgba(8,16,30,.78) 40%,rgba(8,16,30,.34) 100%),linear-gradient(0deg,rgba(8,16,30,.55),transparent 45%)}
@@ -388,7 +389,7 @@ footer a:hover{color:var(--band-fg)}
 <header class="nav" id="siteNav">
   <div class="wrap">
     <a class="brand" href="#top" aria-label="BDR İklimlendirme">
-      <img class="navlogo" src="assets/bdr-logo.png" alt="BDR İklimlendirme" width="107" height="40">
+      <img class="navlogo" src="assets/bdr-logo.png" alt="BDR İklimlendirme" width="155" height="58">
     </a>
     <nav class="menu" aria-label="Ana menü">
       <a href="#hizmetler">Hizmetler</a><a href="#cozumler">Çözümler</a><a href="#kurumsal">Kurumsal</a>
