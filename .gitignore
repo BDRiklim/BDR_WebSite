@@ -1,0 +1,8 @@
+# Yerel araç/ayar dosyaları (herkese açık repoya girmesin)
+.mcp.json
+.claude/
+
+# İşletim sistemi cruft
+Thumbs.db
+desktop.ini
+.DS_Store
