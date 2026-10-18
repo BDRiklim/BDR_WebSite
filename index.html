@@ -68,7 +68,7 @@ img{max-width:100%;display:block}
 .topbar .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:7px}
 .topbar a{color:var(--band-fg)} .topbar .grp{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
 .ok-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:7px;vertical-align:middle}
-header.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transition:box-shadow .2s}
+header.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:linear-gradient(180deg,#0E1B2E,#0A1626);border-bottom:1px solid rgba(255,255,255,.08);transition:box-shadow .2s}
 header.nav.scrolled{box-shadow:var(--shadow-sm)}
 .nav .wrap{display:flex;align-items:center;gap:22px;padding-block:13px}
 .brand{display:flex;align-items:center;gap:11px;flex-shrink:0}
@@ -76,13 +76,18 @@ header.nav.scrolled{box-shadow:var(--shadow-sm)}
 .brand .bt{font-family:var(--display);font-weight:800;font-size:1.26rem;letter-spacing:.01em;line-height:1;color:var(--ink)}
 .brand .bs{font-size:.56rem;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;margin-top:3px;font-weight:600}
 nav.menu{display:flex;gap:2px;margin-left:auto}
-nav.menu a{padding:.5em .78em;border-radius:7px;font-size:.92rem;font-weight:500;color:var(--ink-2);transition:color .18s,background .18s}
-nav.menu a:hover{color:var(--brand);background:var(--tint)}
+nav.menu a{padding:.5em .78em;border-radius:7px;font-size:.92rem;font-weight:500;color:#C6D4EA;transition:color .18s,background .18s}
+nav.menu a:hover{color:#fff;background:rgba(255,255,255,.08)}
 .nav-cta{display:flex;align-items:center;gap:9px;flex-shrink:0}
 .icon-btn{width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
 .icon-btn:hover{border-color:var(--brand);color:var(--brand)}
 .burger{display:none}
-#navPanel{display:none;border-top:1px solid var(--line);background:var(--bg)}
+#navPanel{display:none;border-top:1px solid rgba(255,255,255,.1);background:#0A1626}
+#navPanel a{color:#EAF1FB}
+header.nav .icon-btn{border-color:rgba(255,255,255,.2);color:#EAF1FB}
+header.nav .icon-btn:hover{border-color:#fff;color:#fff}
+.navlogo{height:40px;width:auto;display:block}
+.flogo{height:54px;width:auto;display:block;margin-bottom:14px}
 .hero{position:relative;min-height:clamp(500px,72vh,660px);display:flex;align-items:center;overflow:hidden;background:var(--band-2)}
 .hero-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:60% 38%;z-index:0}
 .hero-scrim{position:absolute;inset:0;z-index:1;background:linear-gradient(100deg,rgba(8,16,30,.94) 0%,rgba(8,16,30,.78) 40%,rgba(8,16,30,.34) 100%),linear-gradient(0deg,rgba(8,16,30,.55),transparent 45%)}
@@ -383,8 +388,7 @@ footer a:hover{color:var(--band-fg)}
 <header class="nav" id="siteNav">
   <div class="wrap">
     <a class="brand" href="#top" aria-label="BDR İklimlendirme">
-      <span class="mark" aria-hidden="true"><svg viewBox="0 0 44 44" width="40" height="40"><rect x="1.5" y="1.5" width="41" height="41" rx="11" fill="url(#lg)"/><g fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M11 16 h11 a3.4 3.4 0 1 0 -3.4 -3.4"/><path d="M11 22 h15 a3.4 3.4 0 1 1 -3.4 3.4"/><path d="M11 28 h8"/></g></svg></span>
-      <span><span class="bt">BDR</span><span class="bs">İklimlendirme</span></span>
+      <img class="navlogo" src="assets/bdr-logo.png" alt="BDR İklimlendirme" width="107" height="40">
     </a>
     <nav class="menu" aria-label="Ana menü">
       <a href="#hizmetler">Hizmetler</a><a href="#cozumler">Çözümler</a><a href="#kurumsal">Kurumsal</a>
@@ -582,7 +586,7 @@ footer a:hover{color:var(--band-fg)}
 <footer><div class="wrap">
   <div class="fgrid">
     <div>
-      <div class="fbrand"><span class="mark" aria-hidden="true"><svg viewBox="0 0 44 44" width="38" height="38"><rect x="1.5" y="1.5" width="41" height="41" rx="11" fill="url(#lg)"/><g fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M11 16 h11 a3.4 3.4 0 1 0 -3.4 -3.4"/><path d="M11 22 h15 a3.4 3.4 0 1 1 -3.4 3.4"/><path d="M11 28 h8"/></g></svg></span><span><span style="color:var(--band-fg);font-family:var(--display);font-weight:800;font-size:1.22rem">BDR</span><span style="display:block;font-size:.56rem;letter-spacing:.3em;color:var(--band-muted);text-transform:uppercase;font-weight:600">İklimlendirme</span></span></div>
+      <div class="fbrand"><img class="flogo" src="assets/bdr-logo.png" alt="BDR İklimlendirme"></div>
       <p style="font-size:.9rem;max-width:34ch" id="footAbout">İstanbul'da klima, VRF ve havalandırma sistemlerinde satış, montaj, servis ve bakım. 7/24 yanınızdayız.</p>
     </div>
     <div><h5>Hizmetler</h5><a href="#cozumler">Klima Satış & Montaj</a><a href="#hizmetler">Arıza & Teknik Servis</a><a href="#bakim">Periyodik Bakım</a><a href="#cozumler">VRF Sistemleri</a><a href="#cozumler">Havalandırma</a></div>
