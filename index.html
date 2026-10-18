@@ -962,7 +962,7 @@ function publishSite(){
 }
 
 V.katalog=function(){return '<div class="sec-head"><span class="note">'+ic(I.box)+' Ürünler kataloğu (site "Ürünler" sayfasına bağlanacak).</span><div class="sp"></div><button class="asmbtn primary" data-add="urun">'+ic(I.plus)+' Yeni ürün</button></div><div class="cardgrid" id="urunGrid">'+urunCards()+'</div>';};
-function urunCards(){return C.products.map(function(u){var im=u.img?'<img src="'+u.img+'" alt="">':ic(I.box);return '<div class="pcard"><div class="im">'+im+'</div><div class="bd"><div style="display:flex;gap:6px;align-items:center">'+pill(u.kat,katCls[u.kat]||"p-neutral")+(u.durum==="Pasif"?pill("Pasif","p-neutral"):"")+'</div><h4 style="margin-top:9px">'+u.ad+'</h4><div class="meta">'+u.marka+' · '+u.kap+'</div><div class="pr tnum">'+TL(u.fiyat)+'</div></div></div>';}).join("");}
+function urunCards(){if(!C.products||!C.products.length)return '<div class="apanel"><div class="pb"><span class="mut">Henüz ürün yok. "Yeni ürün" ile ekleyin.</span></div></div>';return C.products.map(function(u,i){var im=u.img?'<img src="'+u.img+'" alt="">':ic(I.box);return '<div class="pcard"><div class="im">'+im+'</div><div class="bd"><div style="display:flex;gap:6px;align-items:center">'+pill(u.kat,katCls[u.kat]||"p-neutral")+(u.durum==="Pasif"?pill("Pasif","p-neutral"):"")+'</div><h4 style="margin-top:9px">'+esc(u.ad)+'</h4><div class="meta">'+esc(u.marka)+' · '+esc(u.kap)+'</div><div class="pr tnum">'+TL(u.fiyat)+'</div><div style="display:flex;gap:6px;margin-top:11px"><button class="asmbtn line asmbtn-sm" data-urune="'+i+'">'+ic(I.edit)+' Düzenle</button><button class="asmbtn line asmbtn-sm" data-urunx="'+i+'" style="color:var(--bad)">Sil</button></div></div></div>';}).join("");}
 
 V.galeri=function(){return '<div class="sec-head"><span class="note">'+ic(I.gal)+' Eklediğiniz referanslar sitedeki galeride anında görünür.</span><div class="sp"></div><button class="asmbtn primary" data-add="ref">'+ic(I.plus)+' Yeni referans</button></div><div class="dropzone" style="margin-bottom:16px">'+ic(I.gal)+'<div style="margin-top:8px">Montaj fotoğraflarını sürükleyin veya <b>dosya seçin</b></div></div><div class="cardgrid" id="refGrid">'+refCards()+'</div>';};
 function refCards(){return C.references.map(function(r,i){return '<div class="pcard"><div class="im"><img src="'+r.img+'" alt=""></div><div class="bd"><div style="display:flex;align-items:center"><h4>'+r.ad+'</h4><span style="flex:1"></span><span class="sub2">'+r.foto+' foto</span></div><div class="meta">'+r.tur+' · '+r.yer+' · '+r.t+'</div><button class="asmbtn line asmbtn-sm" style="margin-top:10px" data-refx="'+i+'">Kaldır</button></div></div>';}).join("");}
@@ -997,7 +997,9 @@ function brandChips(){return C.brands.map(function(b,i){return '<div class="bchi
 
 V.bakim=function(){return '<div class="sec-head"><span class="note">'+ic(I.bell)+' Yaklaşan bakımlar için SMS/e-posta hatırlatması gönderin.</span><div class="sp"></div><button class="asmbtn primary" data-add="bakim">'+ic(I.plus)+' Cihaz / bakım</button></div><div class="apanel"><div class="tablewrap"><table><thead><tr><th>Müşteri</th><th>Cihaz</th><th>Son bakım</th><th>Sonraki</th><th>Teknisyen</th><th>Durum</th><th></th></tr></thead><tbody>'+bakimlar.map(function(b){return '<tr><td class="cust">'+b.ad+'</td><td class="sub2">'+b.cihaz+'</td><td class="tnum sub2">'+b.son+'</td><td class="tnum">'+b.sonraki+'</td><td>'+b.tek+'</td><td>'+pill(b.durum,bakimCls[b.durum])+'</td><td><button class="asmbtn line asmbtn-sm" data-remind="'+b.ad+'">'+ic(I.send)+' Hatırlat</button></td></tr>';}).join("")+'</tbody></table></div></div>';};
 
-V.stok=function(){var s=[["Split Inverter 12000","Ürün",14,"Yeterli"],["Split Inverter 18000","Ürün",6,"Yeterli"],["R32 Gaz (10kg)","Sarf",3,"Azalıyor"],["Bakır boru 1/4","Parça",48,"Yeterli"],["Dış ünite ayağı","Parça",2,"Kritik"],["Kontrol kartı","Parça",9,"Yeterli"]];var sc={"Yeterli":"p-ok","Azalıyor":"p-warn","Kritik":"p-bad"};return '<div class="minib">'+kpi("Toplam kalem","182",I.stock,'<span class="mut">6 kritik</span>')+kpi("Stok değeri",TL(1245000),I.money,'<span class="mut">Güncel</span>')+kpi("Kritik uyarı","6",I.bell,'<span class="down">Sipariş gerekli</span>')+'</div><div class="apanel"><div class="ph"><h3>Stok listesi</h3><div class="sp"></div><button class="asmbtn primary asmbtn-sm" data-add="stok">'+ic(I.plus)+' Kalem</button></div><div class="tablewrap"><table><thead><tr><th>Ürün / Parça</th><th>Tip</th><th>Adet</th><th>Durum</th></tr></thead><tbody>'+s.map(function(r){return '<tr><td class="cust">'+r[0]+'</td><td class="sub2">'+r[1]+'</td><td class="tnum">'+r[2]+'</td><td>'+pill(r[3],sc[r[3]])+'</td></tr>';}).join("")+'</tbody></table></div></div>';};
+function stokDurum(x){var a=+x.adet||0,m=+x.min_adet||0;if(a<=0)return "Kritik";if(a<=m)return "Azalıyor";return "Yeterli";}
+function stokRows(sc){if(!stokList.length)return '<tr><td colspan="6" style="padding:18px"><span class="mut">Henüz stok kalemi yok. "Kalem ekle" ile başlayın.</span></td></tr>';return stokList.map(function(x){var d=stokDurum(x);return '<tr><td class="cust">'+esc(x.ad)+'</td><td class="sub2">'+esc(x.tip)+'</td><td class="tnum">'+(+x.adet||0)+'</td><td class="tnum sub2">'+(+x.min_adet||0)+'</td><td>'+pill(d,sc[d])+'</td><td><div style="display:flex;gap:6px"><button class="iconbtn" title="Düzenle" data-stoke="'+x.id+'">'+ic(I.edit)+'</button><button class="iconbtn" title="Sil" data-stokx="'+x.id+'" style="color:var(--bad)">'+ic('<path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>')+'</button></div></td></tr>';}).join("");}
+V.stok=function(){var sc={"Yeterli":"p-ok","Azalıyor":"p-warn","Kritik":"p-bad"};var kritik=stokList.filter(function(x){return (+x.adet||0)<=(+x.min_adet||0);}).length;return '<div class="minib">'+kpi("Toplam kalem",String(stokList.length),I.stock,'<span class="mut">'+kritik+' kritik/az</span>')+kpi("Kritik / az",String(kritik),I.bell,kritik?'<span class="down">Sipariş gerekli</span>':'<span class="mut">Sorun yok</span>')+kpi("Toplam adet",String(stokList.reduce(function(a,x){return a+(+x.adet||0);},0)),I.box,'<span class="mut">Tüm kalemler</span>')+'</div><div class="apanel"><div class="ph"><h3>Stok listesi</h3><div class="sp"></div><button class="asmbtn primary asmbtn-sm" data-stokadd="1">'+ic(I.plus)+' Kalem ekle</button></div><div class="tablewrap"><table><thead><tr><th>Ürün / Parça</th><th>Tip</th><th>Adet</th><th>Min</th><th>Durum</th><th></th></tr></thead><tbody>'+stokRows(sc)+'</tbody></table></div></div>';};
 
 V.muhasebe=function(){
   var gel=hareketler.filter(function(h){return h.y>0;}).reduce(function(a,h){return a+h.v;},0),gid=hareketler.filter(function(h){return h.y<0;}).reduce(function(a,h){return a+h.v;},0);
@@ -1018,7 +1020,7 @@ function go(v){if(!V[v])v="dash";curView=v;$$("#admin .navlink").forEach(functio
 
 /* admin events */
 $("#admin").addEventListener("click",function(e){
-  var t=e.target.closest("[data-view],[data-go],[data-add],[data-remind],[data-read],[data-teklif],[data-bx],[data-bi],[data-up],[data-pub],[data-refx],[data-wa],[data-watpl],[data-rvadd],[data-rvx],[data-rvsave],[data-faqadd],[data-faqx],[data-faqsave]");
+  var t=e.target.closest("[data-view],[data-go],[data-add],[data-remind],[data-read],[data-teklif],[data-bx],[data-bi],[data-up],[data-pub],[data-refx],[data-wa],[data-watpl],[data-rvadd],[data-rvx],[data-rvsave],[data-faqadd],[data-faqx],[data-faqsave],[data-stokadd],[data-stoke],[data-stokx],[data-urune],[data-urunx]");
   if(!t)return;
   if(t.hasAttribute("data-view"))return go(t.getAttribute("data-view"));
   if(t.hasAttribute("data-go"))return go(t.getAttribute("data-go"));
@@ -1038,6 +1040,11 @@ $("#admin").addEventListener("click",function(e){
   if(t.hasAttribute("data-faqsave")){collectFaqs();save();applyContent();toast("SSS yayınlandı");return;}
   if(t.hasAttribute("data-remind")){toast(t.getAttribute("data-remind")+" · bakım hatırlatması gönderildi");return;}
   if(t.hasAttribute("data-up")){toast("Video/dosya yükleme gerçek sürümde aktif olacak");return;}
+  if(t.hasAttribute("data-stokadd"))return openForm("Yeni stok kalemi",[{label:"Ürün / Parça",id:"s_ad",type:"input"},{label:"Tip",id:"s_tip",type:"select",opts:["Ürün","Parça","Sarf"]},{label:"Adet",id:"s_adet",type:"input"},{label:"Kritik eşik (min adet)",id:"s_min",type:"input"}],function(){if(!sb)return;sb.from("stok").insert({ad:val("s_ad")||"Kalem",tip:val("s_tip"),adet:parseInt(val("s_adet"))||0,min_adet:parseInt(val("s_min"))||5}).then(function(r){if(r.error){toast("Hata: "+r.error.message);return;}loadData().then(function(){go("stok");toast("Stok kalemi eklendi");});});});
+  if(t.hasAttribute("data-stoke")){var sid=+t.getAttribute("data-stoke");var si=stokList.filter(function(x){return x.id===sid;})[0];if(!si)return;openForm("Stok düzenle",[{label:"Ürün / Parça",id:"s_ad",type:"input",value:si.ad},{label:"Tip",id:"s_tip",type:"select",opts:["Ürün","Parça","Sarf"],value:si.tip},{label:"Adet",id:"s_adet",type:"input",value:si.adet},{label:"Kritik eşik (min adet)",id:"s_min",type:"input",value:si.min_adet}],function(){sb.from("stok").update({ad:val("s_ad"),tip:val("s_tip"),adet:parseInt(val("s_adet"))||0,min_adet:parseInt(val("s_min"))||5}).eq("id",sid).then(function(r){if(r.error){toast("Hata: "+r.error.message);return;}loadData().then(function(){go("stok");toast("Güncellendi");});});});return;}
+  if(t.hasAttribute("data-stokx")){var sdx=+t.getAttribute("data-stokx");openConfirm("Bu stok kalemi silinsin mi?",function(){sb.from("stok").delete().eq("id",sdx).then(function(r){if(r.error){toast("Hata: "+r.error.message);return;}loadData().then(function(){go("stok");toast("Silindi");});});});return;}
+  if(t.hasAttribute("data-urunx")){var ux=+t.getAttribute("data-urunx");openConfirm("Bu ürün silinsin mi?",function(){var nm=C.products[ux]?C.products[ux].ad:"Ürün";C.products.splice(ux,1);save();go("katalog");toast(nm+" silindi");});return;}
+  if(t.hasAttribute("data-urune")){var uei=+t.getAttribute("data-urune");var p=C.products[uei];if(!p)return;openForm("Ürün düzenle",[{label:"Ürün adı",id:"u_ad",type:"input",value:p.ad},{label:"Kategori",id:"u_kat",type:"select",opts:["VRF","Split","AHU","Havalandırma","Isı Pompası","Soğuk Oda"],value:p.kat},{label:"Marka",id:"u_marka",type:"input",value:p.marka},{label:"Kapasite",id:"u_kap",type:"input",value:p.kap},{label:"Fiyat (₺)",id:"u_fiyat",type:"input",value:p.fiyat},{label:"Durum",id:"u_durum",type:"select",opts:["Aktif","Pasif"],value:p.durum}],function(){C.products[uei]={ad:val("u_ad")||p.ad,kat:val("u_kat"),marka:val("u_marka")||"—",kap:val("u_kap")||"—",fiyat:parseInt(val("u_fiyat").replace(/\D/g,""))||0,durum:val("u_durum"),img:p.img||""};save();go("katalog");toast("Ürün güncellendi");});return;}
   if(t.hasAttribute("data-add"))return openAdd(t.getAttribute("data-add"));
 });
 $("#admin").addEventListener("change",function(e){var s=e.target.closest("select.statusel");if(!s)return;var id=+s.getAttribute("data-id");C.talepler.forEach(function(x){if(x.id===id)x.durum=s.value;});if(sb)sb.from("talepler").update({durum:s.value}).eq("id",id).then(function(r){if(r&&r.error)console.warn(r.error.message);});buildNav();toast("Durum güncellendi: "+s.value);});
@@ -1055,6 +1062,16 @@ var addDefs={
   stok:{title:"Stok kalemi",f:[["Ürün / Parça","s_ad","input"],["Tip","s_tip","select",["Ürün","Parça","Sarf"]],["Adet","s_adet","input"]],save:function(){toast("Stok kalemi eklendi (önizleme)");}}
 };
 function val(id){var e=$("#"+id);return e?e.value.trim():"";}
+function openForm(title,fields,onSave){
+  $("#mTitle").textContent=title;
+  $("#mBody").innerHTML='<div class="formgrid" style="grid-template-columns:1fr">'+fields.map(function(f){
+    if(f.type==="select")return '<div class="fld"><label>'+f.label+'</label><select id="'+f.id+'">'+f.opts.map(function(o){return '<option'+((f.value!==undefined&&String(f.value)===String(o))?" selected":"")+'>'+o+'</option>';}).join("")+'</select></div>';
+    if(f.type==="textarea")return '<div class="fld"><label>'+f.label+'</label><textarea id="'+f.id+'" rows="2">'+(f.value!=null?escT(f.value):"")+'</textarea></div>';
+    return '<div class="fld"><label>'+f.label+'</label><input id="'+f.id+'" value="'+(f.value!=null?escA(f.value):"")+'" placeholder="'+f.label+'"></div>';
+  }).join("")+'</div>';
+  curAdd={save:onSave};modal.classList.add("open");
+}
+function openConfirm(msg,onYes){$("#mTitle").textContent="Onay";$("#mBody").innerHTML='<p style="margin:0;color:var(--ink-2)">'+esc(msg)+'</p>';curAdd={save:onYes};modal.classList.add("open");}
 function openAdd(key){var d=addDefs[key];if(!d)return;curAdd=d;$("#mTitle").textContent=d.title;$("#mBody").innerHTML=d.f.map(function(f){if(f[2]==="select")return '<div class="fld"><label>'+f[0]+'</label><select id="'+f[1]+'">'+f[3].map(function(o){return '<option>'+o+'</option>';}).join("")+'</select></div>';return '<div class="fld"><label>'+f[0]+'</label><input id="'+f[1]+'" placeholder="'+f[0]+'"></div>';}).join("");modal.classList.add("open");}
 
 /* sidebar mobile */
@@ -1065,7 +1082,7 @@ $("#viewSite").addEventListener("click",showSite);
 var _lo=$("#logoutBtn");if(_lo)_lo.addEventListener("click",adminLogout);
 
 /* ===== route site <-> admin ===== */
-var adminBuilt=false,curView="dash",rtSub=null;
+var adminBuilt=false,curView="dash",rtSub=null,stokList=[];
 function fmtDate(s){try{var d=new Date(s);return d.toLocaleDateString("tr-TR",{day:"2-digit",month:"short"})+" "+d.toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});}catch(e){return s||"";}}
 function mapTalep(r){return {id:r.id,ad:r.ad,tel:r.tel||"—",hiz:r.hizmet||"—",ilce:r.ilce||"—",t:fmtDate(r.created_at),durum:r.durum||"Yeni",tutar:+r.tutar||0,kaynak:r.kaynak||"—",mesaj:r.mesaj||""};}
 function mapMesaj(r){return {id:r.id,ad:r.ad,tel:r.tel||"—",konu:r.konu||"—",msg:r.mesaj||"",t:fmtDate(r.created_at),okundu:!!r.okundu};}
@@ -1073,10 +1090,12 @@ function loadData(){
   if(!sb)return Promise.resolve();
   return Promise.all([
     sb.from("talepler").select("*").order("created_at",{ascending:false}),
-    sb.from("mesajlar").select("*").order("created_at",{ascending:false})
+    sb.from("mesajlar").select("*").order("created_at",{ascending:false}),
+    sb.from("stok").select("*").order("ad")
   ]).then(function(res){
     if(res[0]&&res[0].data)C.talepler=res[0].data.map(mapTalep);
     if(res[1]&&res[1].data)C.mesajlar=res[1].data.map(mapMesaj);
+    if(res[2]&&res[2].data)stokList=res[2].data;
   }).catch(function(e){console.warn("loadData",e);});
 }
 function onRealtime(){loadData().then(function(){buildNav();if(curView==="dash"||curView==="talepler"||curView==="mesajlar")go(curView);});}
