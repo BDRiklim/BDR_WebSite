@@ -1,6 +1,3 @@
 {
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/", "destination": "/bdr-iklimlendirme.html" }
-  ]
+  "cleanUrls": true
 }
