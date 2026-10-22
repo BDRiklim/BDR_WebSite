@@ -1458,16 +1458,27 @@ function logEvent(tur,detay){try{
   sb.from("olaylar").insert({vid:vid,tur:tur,detay:String(detay||"").slice(0,200),kaynak:kaynak}).catch(function(){});
 }catch(e){}}
 function getGeo(cb){
-  /* IP'den yaklaşık şehir/il — IP saklanmaz, sonuç 24s önbelleğe alınır */
+  /* IP'den yaklaşık şehir/il — IP saklanmaz, sonuç 24s önbelleğe alınır. Yedekli sağlayıcı zinciri. */
   try{var raw=localStorage.getItem("bdr-geo");if(raw){var g=JSON.parse(raw);if(g&&g.ts&&(Date.now()-g.ts<86400000)){cb(g);return;}}}catch(e){}
-  var done=false,to=setTimeout(function(){if(!done){done=true;cb(null);}},2500);
-  try{
-    fetch("https://ipwho.is/").then(function(r){return r.json();}).then(function(d){
-      if(done)return;done=true;clearTimeout(to);
-      if(d&&d.success!==false){var g={sehir:(d.city||"").slice(0,80),bolge:(d.region||"").slice(0,80),ulke:(d.country||"").slice(0,80),ts:Date.now()};try{localStorage.setItem("bdr-geo",JSON.stringify(g));}catch(e){}cb(g);}
-      else cb(null);
-    }).catch(function(){if(done)return;done=true;clearTimeout(to);cb(null);});
-  }catch(e){if(!done){done=true;clearTimeout(to);cb(null);}}
+  var providers=[
+    {u:"https://get.geojs.io/v1/ip/geo.json",m:function(d){return{sehir:d.city,bolge:d.region,ulke:d.country};}},
+    {u:"https://ipapi.co/json/",m:function(d){return(d&&!d.error)?{sehir:d.city,bolge:d.region,ulke:d.country_name}:null;}},
+    {u:"https://freeipapi.com/api/json",m:function(d){return{sehir:d.cityName,bolge:d.regionName,ulke:d.countryName};}}
+  ];
+  var done=false,to=setTimeout(function(){if(!done){done=true;cb(null);}},4000);
+  function clean(s){return s?String(s).replace(/\s*(Province|İli|Ili)$/i,"").trim().slice(0,80):"";}
+  function fin(g){if(done)return;done=true;clearTimeout(to);if(g){try{localStorage.setItem("bdr-geo",JSON.stringify(g));}catch(e){}}cb(g);}
+  function tryP(i){
+    if(done)return;
+    if(i>=providers.length){fin(null);return;}
+    var p=providers[i];
+    fetch(p.u).then(function(r){return r.ok?r.json():Promise.reject(r.status);}).then(function(d){
+      var g=p.m(d);
+      if(g&&(g.sehir||g.bolge))fin({sehir:clean(g.sehir),bolge:clean(g.bolge),ulke:clean(g.ulke),ts:Date.now()});
+      else tryP(i+1);
+    }).catch(function(){tryP(i+1);});
+  }
+  tryP(0);
 }
 function trackVisit(){try{
   if(!sb)return;
