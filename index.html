@@ -1328,12 +1328,14 @@ function loadData(){
     if(res[8]&&res[8].data)olaylar=res[8].data;
   }).catch(function(e){console.warn("loadData",e);});
 }
-function onRealtime(){loadData().then(function(){buildNav();if(curView==="dash"||curView==="talepler"||curView==="mesajlar")go(curView);});}
+function onRealtime(){loadData().then(function(){buildNav();if(curView==="dash"||curView==="talepler"||curView==="mesajlar"||curView==="istatistik")go(curView);});}
 function subscribeRealtime(){
   if(!sb||rtSub)return;
   rtSub=sb.channel("bdr-rt")
     .on("postgres_changes",{event:"*",schema:"public",table:"talepler"},onRealtime)
     .on("postgres_changes",{event:"*",schema:"public",table:"mesajlar"},onRealtime)
+    .on("postgres_changes",{event:"*",schema:"public",table:"ziyaretler"},onRealtime)
+    .on("postgres_changes",{event:"*",schema:"public",table:"olaylar"},onRealtime)
     .subscribe();
 }
 var CONTENT_KEYS=["hero","stats","sections","about","footAbout","contact","waTemplates","ayarlar","brands","references","products","reviews","faqs"];
@@ -1451,10 +1453,11 @@ function visKaynak(ref,utmSource){
   return host || "Diğer";
 }
 function logEvent(tur,detay){try{
-  if(!sb)return;
   var vid=localStorage.getItem("bdr-vid")||"";
   var kaynak=sessionStorage.getItem("bdr-kaynak")||"";
-  sb.from("olaylar").insert({vid:vid,tur:tur,detay:String(detay||"").slice(0,200),kaynak:kaynak}).catch(function(){});
+  var body=JSON.stringify({vid:vid,tur:tur,detay:String(detay||"").slice(0,200),kaynak:kaynak||null});
+  /* keepalive:true → tel:/wa.me/harita linkine basınca sayfa gitse bile istek tamamlanır (supabase-js insert sayfa boşalınca iptal oluyordu) */
+  fetch(SB_URL+"/rest/v1/olaylar",{method:"POST",keepalive:true,headers:{"Content-Type":"application/json","apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Prefer":"return=minimal"},body:body}).catch(function(){});
 }catch(e){}}
 function getGeo(cb){
   /* IP'den yaklaşık şehir/il — IP saklanmaz, sonuç 24s önbelleğe alınır. Yedekli sağlayıcı zinciri. */
