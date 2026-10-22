@@ -213,23 +213,23 @@ footer a:hover{color:var(--band-fg)}
 .wpop{position:fixed;inset:0;background:rgba(10,18,30,.55);display:none;align-items:center;justify-content:center;z-index:130;padding:16px;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
 .wpop.open{display:flex;animation:wpopIn .22s ease}
 @keyframes wpopIn{from{opacity:0}to{opacity:1}}
-.wpop .wbox{background:var(--surface);border-radius:18px;width:100%;max-width:440px;box-shadow:var(--shadow);overflow:hidden;animation:wboxIn .28s cubic-bezier(.2,.8,.3,1)}
+.wpop .wbox{background:var(--surface);border-radius:20px;width:100%;max-width:580px;box-shadow:var(--shadow);overflow:hidden;animation:wboxIn .28s cubic-bezier(.2,.8,.3,1)}
 @keyframes wboxIn{from{transform:translateY(16px) scale(.97);opacity:0}to{transform:none;opacity:1}}
-.wpop .whead{position:relative;padding:24px 22px 6px;text-align:center}
-.wpop .whead .wx{position:absolute;top:12px;right:12px;width:34px;height:34px;border:none;background:var(--surface-2);border-radius:50%;font-size:1.3rem;line-height:1;color:var(--muted);cursor:pointer}
+.wpop .whead{position:relative;padding:34px 34px 10px;text-align:center}
+.wpop .whead .wx{position:absolute;top:14px;right:14px;width:36px;height:36px;border:none;background:var(--surface-2);border-radius:50%;font-size:1.4rem;line-height:1;color:var(--muted);cursor:pointer}
 .wpop .whead .wx:hover{color:var(--ink);background:var(--line-2)}
-.wpop .whead .wkick{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--brand);font-weight:700}
-.wpop .whead h3{font-size:1.35rem;margin:6px 0 5px}
-.wpop .whead p{font-size:.9rem;color:var(--muted)}
-.wpop .wgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 22px 8px}
-.wpop .wsvc{display:flex;align-items:center;gap:10px;padding:.8em .85em;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);cursor:pointer;font-family:inherit;font-size:.92rem;font-weight:600;color:var(--ink);text-align:left;transition:border-color .15s,background .15s,transform .15s}
+.wpop .whead .wkick{display:block;font-family:var(--display);font-size:1.5rem;letter-spacing:.02em;color:var(--brand);font-weight:800;margin-bottom:10px}
+.wpop .whead h3{font-size:1.7rem;margin:4px 0 8px}
+.wpop .whead p{font-size:1rem;color:var(--muted);max-width:40ch;margin:0 auto}
+.wpop .wgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:22px 34px 10px}
+.wpop .wsvc{display:flex;align-items:center;gap:12px;padding:1.05em 1.05em;border:1px solid var(--line);border-radius:13px;background:var(--surface-2);cursor:pointer;font-family:inherit;font-size:1rem;font-weight:600;color:var(--ink);text-align:left;transition:border-color .15s,background .15s,transform .15s}
 .wpop .wsvc:hover{border-color:var(--brand);background:var(--tint);transform:translateY(-1px)}
-.wpop .wsvc .wi{flex:none;width:34px;height:34px;border-radius:9px;background:var(--brand);color:#fff;display:grid;place-items:center}
+.wpop .wsvc .wi{flex:none;width:40px;height:40px;border-radius:10px;background:var(--brand);color:#fff;display:grid;place-items:center}
 .wpop .wsvc.full{grid-column:1 / -1}
-.wpop .wfoot{padding:6px 22px 20px;text-align:center}
-.wpop .wfoot a{font-size:.84rem;color:var(--muted);cursor:pointer;font-weight:600}
+.wpop .wfoot{padding:8px 34px 24px;text-align:center}
+.wpop .wfoot a{font-size:.9rem;color:var(--muted);cursor:pointer;font-weight:600}
 .wpop .wfoot a:hover{color:var(--brand)}
-@media(max-width:430px){.wpop .wgrid{grid-template-columns:1fr}.wpop .wsvc.full{grid-column:auto}}
+@media(max-width:520px){.wpop .wgrid{grid-template-columns:1fr}.wpop .wsvc.full{grid-column:auto}.wpop .whead{padding:28px 22px 8px}.wpop .wgrid{padding:18px 22px 8px}.wpop .wfoot{padding:8px 22px 20px}.wpop .whead .wkick{font-size:1.3rem}.wpop .whead h3{font-size:1.45rem}}
 /* yol tarifi inline link */
 .dirlink{display:inline-flex;align-items:center;gap:6px;margin-top:9px;font-size:.8rem;font-weight:600;color:var(--brand);border:1px solid var(--line);border-radius:7px;padding:.38em .72em}
 .dirlink:hover{border-color:var(--brand);background:var(--tint)}
@@ -665,21 +665,29 @@ footer a:hover{color:var(--band-fg)}
 .cbar.show{display:flex}
 .cbar p{margin:0;font-size:.86rem;color:var(--ink-2);flex:1 1 320px;line-height:1.55}
 .cbar p a{color:var(--brand);font-weight:600}
-.cbar .cbtn{flex:none;background:var(--brand);color:#fff;border:none;border-radius:var(--radius-sm);padding:.72em 1.4em;font-family:inherit;font-weight:700;font-size:.88rem;cursor:pointer;transition:background .15s}
+.cbar .cbtns{flex:none;display:flex;gap:10px}
+.cbar .cbtn{background:var(--brand);color:#fff;border:none;border-radius:var(--radius-sm);padding:.72em 1.4em;font-family:inherit;font-weight:700;font-size:.88rem;cursor:pointer;transition:background .15s,border-color .15s}
 .cbar .cbtn:hover{background:var(--brand-2)}
-@media(max-width:560px){.cbar{flex-direction:column;align-items:stretch;left:10px;right:10px;bottom:10px}.cbar .cbtn{width:100%}}
+.cbar .cbtn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.cbar .cbtn.ghost:hover{background:var(--surface-2);color:var(--ink-2)}
+@media(max-width:560px){.cbar{flex-direction:column;align-items:stretch;left:10px;right:10px;bottom:10px}.cbar .cbtns{flex-direction:column}.cbar .cbtn{width:100%}}
 </style>
 <div class="cbar" id="cbar" role="region" aria-label="Çerez ve gizlilik bilgilendirmesi">
   <p>Ziyaretleri <b>anonim</b> olarak ölçüyoruz: geldiğiniz kanal, cihaz türü ve IP'den <b>yaklaşık</b> şehir/ilçe. <b>IP adresiniz saklanmaz</b>, isim/telefon gibi kişisel verileriniz toplanmaz. Amaç yalnızca hizmetimizi geliştirmektir. Ayrıntı için <a href="#iletisim">bize ulaşın</a>.</p>
-  <button class="cbtn" id="cokBtn" type="button">Anladım</button>
+  <div class="cbtns">
+    <button class="cbtn ghost" id="cokIgnore" type="button">Yoksay</button>
+    <button class="cbtn" id="cokAccept" type="button">Çerezleri kabul et</button>
+  </div>
 </div>
 <script>
 (function(){try{
-  var bar=document.getElementById("cbar"),btn=document.getElementById("cokBtn"),fl=document.getElementById("privacyLink");
+  var bar=document.getElementById("cbar"),acc=document.getElementById("cokAccept"),ign=document.getElementById("cokIgnore"),fl=document.getElementById("privacyLink");
   if(!bar)return;
-  var ok=false;try{ok=localStorage.getItem("bdr-cookie-ok")==="1";}catch(e){}
-  if(!ok)setTimeout(function(){bar.classList.add("show");},900);
-  if(btn)btn.addEventListener("click",function(){try{localStorage.setItem("bdr-cookie-ok","1");}catch(e){}bar.classList.remove("show");});
+  var seen=false;try{seen=!!localStorage.getItem("bdr-cookie");}catch(e){}
+  if(!seen)setTimeout(function(){bar.classList.add("show");},900);
+  function close(v){try{localStorage.setItem("bdr-cookie",v);}catch(e){}bar.classList.remove("show");}
+  if(acc)acc.addEventListener("click",function(){close("accepted");});
+  if(ign)ign.addEventListener("click",function(){close("ignored");});
   if(fl)fl.addEventListener("click",function(e){e.preventDefault();bar.classList.add("show");});
 }catch(e){}})();
 </script>
@@ -691,14 +699,14 @@ footer a:hover{color:var(--band-fg)}
       <button class="wx" id="wpopX" aria-label="Kapat">&times;</button>
       <span class="wkick">BDR İklimlendirme</span>
       <h3 id="wpopTitle">Size ulaşalım</h3>
-      <p>Hangi konuda yardımcı olalım? Seçin, en kısa sürede size dönelim.</p>
+      <p>Satış, montaj, bakım ve 7/24 servis — tek çatı altında.</p>
     </div>
     <div class="wgrid">
       <button class="wsvc" data-svc="Montaj" type="button"><span class="wi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>Montaj</button>
       <button class="wsvc" data-svc="Bakım" type="button"><span class="wi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Bakım</button>
       <button class="wsvc" data-svc="Arıza Tespit" type="button"><span class="wi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></span>Arıza Tespit</button>
       <button class="wsvc" data-svc="Onarım" type="button"><span class="wi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>Onarım</button>
-      <button class="wsvc full" data-svc="2. El Cihaz" type="button"><span class="wi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18M9 21V9"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg></span>2. El Cihaz (alım / satım)</button>
+      <button class="wsvc full" data-svc="2. El Cihaz" type="button"><span class="wi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18M9 21V9"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg></span>2. El Cihaz (Alım / Satım)</button>
     </div>
     <div class="wfoot"><a id="wpopLater" role="button" tabindex="0">Şimdi değil, teşekkürler</a></div>
   </div>
