@@ -967,9 +967,9 @@ modal.addEventListener("click",function(e){if(e.target===modal)closeModal();});
 $("#mSave").addEventListener("click",function(){ if(curAdd&&curAdd.save)curAdd.save(); closeModal(); });
 
 /* ===== ADMIN ===== */
-var I={dash:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',crm:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/>',msg:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',box:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5M12 22V12"/>',gal:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>',tag:'<path d="M20.6 13.4 12 22l-9-9V3h10z"/><circle cx="7.5" cy="7.5" r="1.5"/>',cms:'<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',wrench:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2-2z"/>',fin:'<path d="M3 12h4l2 6 4-14 2 8h6"/>',stock:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>',set:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82 2 2 0 1 1-2.83 2.83 1.65 1.65 0 0 0-2.82 1.17 2 2 0 1 1-4 0 1.65 1.65 0 0 0-2.82-1.17 2 2 0 1 1-2.83-2.83A1.65 1.65 0 0 0 4.6 15a2 2 0 1 1 0-4 1.65 1.65 0 0 0 1.68-2.82 2 2 0 1 1 2.83-2.83A1.65 1.65 0 0 0 12 4.6a2 2 0 1 1 4 0 1.65 1.65 0 0 0 2.82 1.68 2 2 0 1 1 2.83 2.83A1.65 1.65 0 0 0 19.4 11a2 2 0 1 1 0 4z"/>',money:'<rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',check:'<path d="M20 6 9 17l-5-5"/>',send:'<path d="M3 11l19-9-9 19-2-8-8-2z"/>',bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>',plus:'<path d="M12 5v14M5 12h14"/>',edit:'<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>'};
-var NAV=[{grp:"Genel",items:[["dash","Panel",I.dash]]},{grp:"Satış & Müşteri",items:[["talepler","Talepler & Teklifler",I.crm,"crm"],["mesajlar","Mesajlar",I.msg,"msg"]]},{grp:"İçerik Yönetimi",items:[["site","Site İçeriği",I.cms],["katalog","Ürün Kataloğu",I.box],["galeri","Referans & Galeri",I.gal],["yorumlar","Müşteri Yorumları",I.msg],["sss","Sık Sorulanlar",I.cms],["markalar","Markalar",I.tag]]},{grp:"Operasyon",items:[["bakim","Servis & Bakım",I.wrench],["stok","Stok & Parça",I.stock]]},{grp:"Finans",items:[["muhasebe","Muhasebe",I.fin]]},{grp:"Sistem",items:[["kullanicilar","Kullanıcılar & Roller",I.users],["ayarlar","Ayarlar",I.set]]}];
-var TITLES={dash:["Panel","Genel bakış"],talepler:["Talepler & Teklifler","Durum değişikliği huniyi ve paneli günceller"],mesajlar:["Mesajlar","Siteden gelen iletişim mesajları"],site:["Site İçeriği","Düzenlemeler anında siteye yansır"],katalog:["Ürün Kataloğu","Ürün ve hizmetleri yönetin"],galeri:["Referans & Galeri","Eklenen fotoğraflar sitedeki galeride görünür"],yorumlar:["Müşteri Yorumları","Sitede görünen müşteri yorumlarını düzenleyin"],sss:["Sık Sorulan Sorular","Sitedeki SSS bölümünü düzenleyin"],markalar:["Markalar","Açık markalar sitedeki kayan şeritte görünür"],bakim:["Servis & Bakım","Cihaz, bakım ve hatırlatma takibi"],stok:["Stok & Parça","Cihaz ve yedek parça stoğu"],muhasebe:["Muhasebe","Gelir-gider, fatura ve nakit akışı"],kullanicilar:["Kullanıcılar & Roller","Ekip ve yetki yönetimi"],ayarlar:["Ayarlar","Firma bilgileri ve entegrasyonlar"]};
+var I={dash:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',crm:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/>',msg:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',box:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5M12 22V12"/>',gal:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>',tag:'<path d="M20.6 13.4 12 22l-9-9V3h10z"/><circle cx="7.5" cy="7.5" r="1.5"/>',cms:'<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',wrench:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2-2z"/>',fin:'<path d="M3 12h4l2 6 4-14 2 8h6"/>',stock:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>',set:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82 2 2 0 1 1-2.83 2.83 1.65 1.65 0 0 0-2.82 1.17 2 2 0 1 1-4 0 1.65 1.65 0 0 0-2.82-1.17 2 2 0 1 1-2.83-2.83A1.65 1.65 0 0 0 4.6 15a2 2 0 1 1 0-4 1.65 1.65 0 0 0 1.68-2.82 2 2 0 1 1 2.83-2.83A1.65 1.65 0 0 0 12 4.6a2 2 0 1 1 4 0 1.65 1.65 0 0 0 2.82 1.68 2 2 0 1 1 2.83 2.83A1.65 1.65 0 0 0 19.4 11a2 2 0 1 1 0 4z"/>',money:'<rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',check:'<path d="M20 6 9 17l-5-5"/>',send:'<path d="M3 11l19-9-9 19-2-8-8-2z"/>',bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>',plus:'<path d="M12 5v14M5 12h14"/>',edit:'<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',chart:'<path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx="1"/><rect x="12" y="7" width="3" height="10" rx="1"/><rect x="17" y="13" width="3" height="4" rx="1"/>'};
+var NAV=[{grp:"Genel",items:[["dash","Panel",I.dash],["istatistik","Ziyaretçi İstatistikleri",I.chart]]},{grp:"Satış & Müşteri",items:[["talepler","Talepler & Teklifler",I.crm,"crm"],["mesajlar","Mesajlar",I.msg,"msg"]]},{grp:"İçerik Yönetimi",items:[["site","Site İçeriği",I.cms],["katalog","Ürün Kataloğu",I.box],["galeri","Referans & Galeri",I.gal],["yorumlar","Müşteri Yorumları",I.msg],["sss","Sık Sorulanlar",I.cms],["markalar","Markalar",I.tag]]},{grp:"Operasyon",items:[["bakim","Servis & Bakım",I.wrench],["stok","Stok & Parça",I.stock]]},{grp:"Finans",items:[["muhasebe","Muhasebe",I.fin]]},{grp:"Sistem",items:[["kullanicilar","Kullanıcılar & Roller",I.users],["ayarlar","Ayarlar",I.set]]}];
+var TITLES={dash:["Panel","Genel bakış"],istatistik:["Ziyaretçi İstatistikleri","Siteyi kaç kişi ziyaret etti"],talepler:["Talepler & Teklifler","Durum değişikliği huniyi ve paneli günceller"],mesajlar:["Mesajlar","Siteden gelen iletişim mesajları"],site:["Site İçeriği","Düzenlemeler anında siteye yansır"],katalog:["Ürün Kataloğu","Ürün ve hizmetleri yönetin"],galeri:["Referans & Galeri","Eklenen fotoğraflar sitedeki galeride görünür"],yorumlar:["Müşteri Yorumları","Sitede görünen müşteri yorumlarını düzenleyin"],sss:["Sık Sorulan Sorular","Sitedeki SSS bölümünü düzenleyin"],markalar:["Markalar","Açık markalar sitedeki kayan şeritte görünür"],bakim:["Servis & Bakım","Cihaz, bakım ve hatırlatma takibi"],stok:["Stok & Parça","Cihaz ve yedek parça stoğu"],muhasebe:["Muhasebe","Gelir-gider, fatura ve nakit akışı"],kullanicilar:["Kullanıcılar & Roller","Ekip ve yetki yönetimi"],ayarlar:["Ayarlar","Firma bilgileri ve entegrasyonlar"]};
 var DURUMLAR=["Yeni","Arandı","Teklif Verildi","Kazanıldı","Kaybedildi"];
 var durumCls={Yeni:"p-info","Arandı":"p-neutral","Teklif Verildi":"p-warn","Kazanıldı":"p-ok","Kaybedildi":"p-bad"};
 var katCls={VRF:"p-info",Split:"p-ok",AHU:"p-warn","Havalandırma":"p-neutral","Isı Pompası":"p-info","Soğuk Oda":"p-neutral"};
@@ -995,6 +995,9 @@ var ROLE_VIEWS={"Teknisyen":["dash","talepler","mesajlar","bakim","stok"],"Muhas
 function mapUser(r){return {id:r.id,ad:r.ad||"",mail:r.email||"",rol:r.rol||"Teknisyen",durum:r.durum||"Aktif"};}
 function roleCan(v){if(myRole==="Yönetici"||!ROLE_VIEWS[myRole])return true;return ROLE_VIEWS[myRole].indexOf(v)>=0;}
 var gelirAylik=[320,286,352,298,410,372,448,487],aylar=["Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki"];
+var ziyaretler=[];
+function ziyaretGunluk(){var days=14,labels=[],sums=[],idx={},now=new Date();for(var i=days-1;i>=0;i--){var d=new Date(now.getFullYear(),now.getMonth(),now.getDate()-i);var k=d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate();idx[k]=labels.length;labels.push(d.getDate()+"/"+(d.getMonth()+1));sums.push(0);}ziyaretler.forEach(function(z){if(!z.created_at)return;var d=new Date(z.created_at);var k=d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate();if(idx[k]!==undefined)sums[idx[k]]++;});return {data:sums,labels:labels};}
+function wireVisit(root,data){var tip=$("#ttip");$$("rect.barm",root).forEach(function(r){r.style.cursor="pointer";r.addEventListener("mousemove",function(e){tip.textContent=data[+r.getAttribute("data-i")]+" ziyaret";tip.style.opacity="1";tip.style.left=(e.clientX+12)+"px";tip.style.top=(e.clientY-10)+"px";r.setAttribute("fill","var(--brand-2)");});r.addEventListener("mouseleave",function(){tip.style.opacity="0";r.setAttribute("fill","var(--brand)");});});}
 
 function pill(t,c){return '<span class="pill '+c+'">'+t+'</span>';}
 function counts(){var c={Yeni:0,"Arandı":0,"Teklif Verildi":0,"Kazanıldı":0,"Kaybedildi":0};C.talepler.forEach(function(t){if(c[t.durum]!=null)c[t.durum]++;});return c;}
@@ -1020,6 +1023,20 @@ V.dash=function(){
 };
 function pipe(c){var mx=Math.max(1,Math.max.apply(null,DURUMLAR.map(function(d){return c[d];})));var col={Yeni:"#4C86FF","Arandı":"#7B8AA3","Teklif Verildi":"#C27C16","Kazanıldı":"#1F9D62","Kaybedildi":"#D13D3D"};return '<div class="pipe">'+DURUMLAR.map(function(d){return '<div class="row"><div class="nm">'+d+'</div><div class="bar"><i style="width:'+(c[d]/mx*100)+'%;background:'+col[d]+'"></i></div><div class="ct tnum">'+c[d]+'</div></div>';}).join("")+'</div>';}
 
+V.istatistik=function(){
+  var now=new Date();
+  var sameDay=function(d){return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();};
+  var total=ziyaretler.length,uniq={},bugun=0,buhafta=0,buay=0;
+  var hafta=new Date(now.getFullYear(),now.getMonth(),now.getDate()-6);
+  ziyaretler.forEach(function(z){if(z.vid)uniq[z.vid]=1;if(!z.created_at)return;var d=new Date(z.created_at);if(sameDay(d))bugun++;if(d>=hafta)buhafta++;if(d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear())buay++;});
+  var uniqN=Object.keys(uniq).length;
+  var h='<div class="sec-head"><span class="note">'+ic(I.chart)+' Her ziyaret anonim olarak sayılır (kişisel veri toplanmaz). Benzersiz ziyaretçi, aynı tarayıcının tekrar gelişini tek sayar.</span></div>';
+  h+='<div class="kpis">'+kpi("Toplam ziyaret",String(total),I.chart,'<span class="mut">Tüm zamanlar</span>')+kpi("Benzersiz ziyaretçi",String(uniqN),I.users,'<span class="mut">Farklı cihaz/tarayıcı</span>')+kpi("Bugün",String(bugun),I.clock,'<span class="up">Son 24 saat değil, bugün</span>')+kpi("Bu hafta",String(buhafta),I.clock,'<span class="mut">Son 7 gün</span>')+kpi("Bu ay",String(buay),I.money,'<span class="mut">'+["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"][now.getMonth()]+'</span>')+'</div>';
+  h+='<div class="apanel"><div class="ph"><h3>Son 14 gün</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">Günlük ziyaret</span></div><div class="pb"><div id="vis1"></div></div></div>';
+  h+='<div class="apanel" style="margin-top:16px"><div class="ph"><h3>Son ziyaretler</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">Son 30 kayıt</span></div><div class="tablewrap"><table><thead><tr><th>Tarih / Saat</th><th>Sayfa</th><th>Geldiği kaynak</th></tr></thead><tbody>'+ziyaretRows()+'</tbody></table></div></div>';
+  return h;
+};
+function ziyaretRows(){if(!ziyaretler.length)return '<tr><td colspan="3" style="padding:18px"><span class="mut">Henüz ziyaret kaydı yok. Site ziyaret edildikçe burada görünür.</span></td></tr>';return ziyaretler.slice(0,30).map(function(z){var ref=z.referrer?esc(String(z.referrer)):"";var kaynak=ref?('<span class="sub2">'+ref.replace(/^https?:\/\//,"").slice(0,48)+'</span>'):'<span class="mut">Doğrudan</span>';return '<tr><td class="tnum sub2">'+fmtDate(z.created_at)+'</td><td class="sub2">'+(z.path?esc(String(z.path)):"/")+'</td><td>'+kaynak+'</td></tr>';}).join("");}
 V.talepler=function(){return '<div class="sec-head"><span class="note">'+ic(I.crm)+' Durum değiştirince huni + Panel güncellenir, kayıt tarayıcınıza yazılır.</span><div class="sp"></div><button class="asmbtn primary asmbtn tiny" data-add="talep">'+ic(I.plus)+' Yeni talep</button></div><div class="apanel"><div class="tablewrap"><table><thead><tr><th>Müşteri</th><th>Hizmet</th><th>İlçe</th><th>Kaynak</th><th>Tarih</th><th>Tutar</th><th>Durum</th><th></th></tr></thead><tbody id="talepBody">'+talepRows()+'</tbody></table></div></div>';};
 function talepRows(){return C.talepler.map(function(t){return '<tr><td class="cust">'+t.ad+'<div class="sub2 tnum">'+t.tel+'</div></td><td>'+t.hiz+'</td><td>'+t.ilce+'</td><td class="sub2">'+t.kaynak+'</td><td class="tnum">'+t.t+'</td><td class="tnum">'+(t.tutar?TL(t.tutar):"—")+'</td><td><select class="statusel" data-id="'+t.id+'">'+DURUMLAR.map(function(d){return '<option'+(d===t.durum?' selected':'')+'>'+d+'</option>';}).join("")+'</select></td><td><div style="display:flex;gap:6px"><button class="iconbtn" title="WhatsApp mesajı gönder" data-wa="t:'+t.id+'" style="color:#1F9D62">'+WA_ICON+'</button><button class="iconbtn" title="Teklif oluştur (PDF)" data-teklif="'+t.id+'">'+ic(I.cms)+'</button></div></td></tr>';}).join("");}
 
@@ -1106,7 +1123,7 @@ function saveWaTpl(){function g(id){var e=$("#"+id);return e?e.value:"";}C.waTem
 
 /* nav + router */
 function buildNav(){var c=counts(),h="";NAV.forEach(function(g){var gi="";g.items.forEach(function(it){if(!roleCan(it[0]))return;var badge="";if(it[3]==="crm")badge='<span class="badge">'+(c.Yeni+c["Arandı"])+'</span>';if(it[3]==="msg")badge='<span class="badge">'+C.mesajlar.filter(function(m){return !m.okundu;}).length+'</span>';gi+='<button class="navlink" data-view="'+it[0]+'">'+ic(it[2])+'<span>'+it[1]+'</span>'+badge+'</button>';});if(gi)h+='<div class="navgrp"><div class="lbl">'+g.grp+'</div>'+gi+'</div>';});$("#nav").innerHTML=h;}
-function go(v){if(!V[v])v="dash";if(!roleCan(v))v="dash";curView=v;$$("#admin .navlink").forEach(function(n){n.classList.toggle("active",n.getAttribute("data-view")===v);});$("#pgTitle").textContent=TITLES[v][0];$("#pgSub").textContent=TITLES[v][1];$("#acontent").innerHTML=V[v]();if(v==="dash"){var ag=aylikGelir();var r=$("#rev1");r.innerHTML=barChart(ag.data,ag.labels);wireChart(r,ag.data);}if(v==="muhasebe"){var ag2=aylikGelir();var r2=$("#rev2");r2.innerHTML=barChart(ag2.data,ag2.labels);wireChart(r2,ag2.data);}closeSide();$("#admin").scrollTop=0;}
+function go(v){if(!V[v])v="dash";if(!roleCan(v))v="dash";curView=v;$$("#admin .navlink").forEach(function(n){n.classList.toggle("active",n.getAttribute("data-view")===v);});$("#pgTitle").textContent=TITLES[v][0];$("#pgSub").textContent=TITLES[v][1];$("#acontent").innerHTML=V[v]();if(v==="dash"){var ag=aylikGelir();var r=$("#rev1");r.innerHTML=barChart(ag.data,ag.labels);wireChart(r,ag.data);}if(v==="muhasebe"){var ag2=aylikGelir();var r2=$("#rev2");r2.innerHTML=barChart(ag2.data,ag2.labels);wireChart(r2,ag2.data);}if(v==="istatistik"){var zg=ziyaretGunluk(),rv=$("#vis1");if(rv){if(zg.data.reduce(function(a,b){return a+b;},0)>0){rv.innerHTML=barChart(zg.data,zg.labels);wireVisit(rv,zg.data);}else{rv.innerHTML='<div style="padding:30px;text-align:center" class="mut">Henüz ziyaret verisi yok. Site ziyaret edildikçe burada görünür.</div>';}}}closeSide();$("#admin").scrollTop=0;}
 
 /* admin events */
 $("#admin").addEventListener("click",function(e){
@@ -1242,7 +1259,8 @@ function loadData(){
     sb.from("bakimlar").select("*").order("sonraki",{ascending:true}),
     sb.from("hareketler").select("*").order("tarih",{ascending:false}),
     sb.from("faturalar").select("*").order("created_at",{ascending:false}),
-    sb.from("profiles").select("*").order("created_at")
+    sb.from("profiles").select("*").order("created_at"),
+    sb.from("ziyaretler").select("*").order("created_at",{ascending:false}).limit(3000)
   ]).then(function(res){
     if(res[0]&&res[0].data)C.talepler=res[0].data.map(mapTalep);
     if(res[1]&&res[1].data)C.mesajlar=res[1].data.map(mapMesaj);
@@ -1251,6 +1269,7 @@ function loadData(){
     if(res[4]&&res[4].data)hareketler=res[4].data.map(mapHareket);
     if(res[5]&&res[5].data)faturalar=res[5].data.map(mapFatura);
     if(res[6]&&res[6].data)kullanicilar=res[6].data.map(mapUser);
+    if(res[7]&&res[7].data)ziyaretler=res[7].data;
   }).catch(function(e){console.warn("loadData",e);});
 }
 function onRealtime(){loadData().then(function(){buildNav();if(curView==="dash"||curView==="talepler"||curView==="mesajlar")go(curView);});}
@@ -1338,10 +1357,21 @@ window.addEventListener("hashchange",function(){if(location.hash==="#yonetim")op
   setTimeout(openW, reduce?300:1100);
 })();
 
+/* ===== ziyaretçi sayacı ===== */
+function trackVisit(){try{
+  if(!sb)return;
+  if(location.hash==="#yonetim")return; /* panel açılışını sayma */
+  if(sessionStorage.getItem("bdr-visit"))return; /* aynı oturumda tek kez */
+  var vid=localStorage.getItem("bdr-vid");
+  if(!vid){vid=Date.now().toString(36)+Math.random().toString(36).slice(2,10);try{localStorage.setItem("bdr-vid",vid);}catch(e){}}
+  sb.from("ziyaretler").insert({vid:vid,path:(location.pathname||"/"),referrer:(document.referrer||"").slice(0,300)}).then(function(r){if(r&&!r.error){try{sessionStorage.setItem("bdr-visit","1");}catch(e){}}}).catch(function(){});
+}catch(e){}}
+
 /* ===== init ===== */
 applyContent();
 countUp();
 loadContent().then(function(){applyContent();});
+trackVisit();
 if(location.hash==="#yonetim")openAdmin();
 })();
 </script>
