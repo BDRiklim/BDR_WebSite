@@ -938,7 +938,7 @@ if(form)form.addEventListener("submit",function(e){
     toast("Talebiniz alındı");
   };
   if(sb){
-    sb.from("talepler").insert({ad:ad,tel:tel||null,hizmet:hiz,ilce:ilce||null,mesaj:mesaj||null,kaynak:"Web formu"}).then(function(r){if(r.error)console.warn("talep:",r.error.message);done();});
+    sb.from("talepler").insert({ad:ad,tel:tel||null,hizmet:hiz,ilce:ilce||null,mesaj:mesaj||null,kaynak:"Web formu"}).then(function(r){if(r.error)console.warn("talep:",r.error.message);else logEvent("talep",hiz||"");done();});
     if(mesaj)sb.from("mesajlar").insert({ad:ad,tel:tel||null,konu:hiz,mesaj:mesaj}).then(function(r){if(r.error)console.warn("mesaj:",r.error.message);});
   }else{done();}
 });
@@ -1029,6 +1029,9 @@ function adminMail(){return (((typeof C!=="undefined"&&C.ayarlar&&C.ayarlar.admi
 function isAdmin(){return myRole==="Yönetici";}
 var gelirAylik=[320,286,352,298,410,372,448,487],aylar=["Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki"];
 var ziyaretler=[];
+var olaylar=[];
+function topCount(arr,keyFn,n){var m={};arr.forEach(function(x){var k=keyFn(x);if(k==null||k==="")return;m[k]=(m[k]||0)+1;});var a=Object.keys(m).map(function(k){return[k,m[k]];});a.sort(function(x,y){return y[1]-x[1];});return n?a.slice(0,n):a;}
+function breakdownBars(pairs,col){if(!pairs.length)return '<div style="padding:14px"><span class="mut">Veri yok</span></div>';var mx=pairs[0][1]||1,tot=pairs.reduce(function(a,p){return a+p[1];},0);return '<div class="pipe">'+pairs.map(function(p){var pct=tot?Math.round(p[1]/tot*100):0;return '<div class="row"><div class="nm">'+esc(String(p[0]))+'</div><div class="bar"><i style="width:'+(p[1]/mx*100)+'%;background:'+(col||"var(--brand)")+'"></i></div><div class="ct tnum">'+p[1]+' · %'+pct+'</div></div>';}).join("")+'</div>';}
 function ziyaretGunluk(){var days=14,labels=[],sums=[],idx={},now=new Date();for(var i=days-1;i>=0;i--){var d=new Date(now.getFullYear(),now.getMonth(),now.getDate()-i);var k=d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate();idx[k]=labels.length;labels.push(d.getDate()+"/"+(d.getMonth()+1));sums.push(0);}ziyaretler.forEach(function(z){if(!z.created_at)return;var d=new Date(z.created_at);var k=d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate();if(idx[k]!==undefined)sums[idx[k]]++;});return {data:sums,labels:labels};}
 function wireVisit(root,data){var tip=$("#ttip");$$("rect.barm",root).forEach(function(r){r.style.cursor="pointer";r.addEventListener("mousemove",function(e){tip.textContent=data[+r.getAttribute("data-i")]+" ziyaret";tip.style.opacity="1";tip.style.left=(e.clientX+12)+"px";tip.style.top=(e.clientY-10)+"px";r.setAttribute("fill","var(--brand-2)");});r.addEventListener("mouseleave",function(){tip.style.opacity="0";r.setAttribute("fill","var(--brand)");});});}
 
@@ -1059,17 +1062,34 @@ function pipe(c){var mx=Math.max(1,Math.max.apply(null,DURUMLAR.map(function(d){
 V.istatistik=function(){
   var now=new Date();
   var sameDay=function(d){return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();};
-  var total=ziyaretler.length,uniq={},bugun=0,buhafta=0,buay=0;
+  var total=ziyaretler.length,uniq={},bugun=0,buhafta=0,buay=0,tekrarN=0;
   var hafta=new Date(now.getFullYear(),now.getMonth(),now.getDate()-6);
-  ziyaretler.forEach(function(z){if(z.vid)uniq[z.vid]=1;if(!z.created_at)return;var d=new Date(z.created_at);if(sameDay(d))bugun++;if(d>=hafta)buhafta++;if(d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear())buay++;});
+  ziyaretler.forEach(function(z){if(z.vid)uniq[z.vid]=1;if(z.tekrar)tekrarN++;if(!z.created_at)return;var d=new Date(z.created_at);if(sameDay(d))bugun++;if(d>=hafta)buhafta++;if(d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear())buay++;});
   var uniqN=Object.keys(uniq).length;
-  var h='<div class="sec-head"><span class="note">'+ic(I.chart)+' Her ziyaret anonim olarak sayılır (kişisel veri toplanmaz). Benzersiz ziyaretçi, aynı tarayıcının tekrar gelişini tek sayar.</span></div>';
-  h+='<div class="kpis">'+kpi("Toplam ziyaret",String(total),I.chart,'<span class="mut">Tüm zamanlar</span>')+kpi("Benzersiz ziyaretçi",String(uniqN),I.users,'<span class="mut">Farklı cihaz/tarayıcı</span>')+kpi("Bugün",String(bugun),I.clock,'<span class="up">Son 24 saat değil, bugün</span>')+kpi("Bu hafta",String(buhafta),I.clock,'<span class="mut">Son 7 gün</span>')+kpi("Bu ay",String(buay),I.money,'<span class="mut">'+["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"][now.getMonth()]+'</span>')+'</div>';
-  h+='<div class="apanel"><div class="ph"><h3>Son 14 gün</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">Günlük ziyaret</span></div><div class="pb"><div id="vis1"></div></div></div>';
-  h+='<div class="apanel" style="margin-top:16px"><div class="ph"><h3>Son ziyaretler</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">Son 30 kayıt</span></div><div class="tablewrap"><table><thead><tr><th>Tarih / Saat</th><th>Sayfa</th><th>Geldiği kaynak</th></tr></thead><tbody>'+ziyaretRows()+'</tbody></table></div></div>';
+  var ev={ara:0,whatsapp:0,yol:0,talep:0};olaylar.forEach(function(o){if(ev[o.tur]!=null)ev[o.tur]++;});
+  var h='<div class="sec-head"><span class="note">'+ic(I.chart)+' Ziyaretler anonim toplanır — isim/telefon alınmaz, IP adresi saklanmaz. Şehir/il IP\'den yaklaşık tahmindir (il genelde doğru, ilçe değişebilir). Kaynak, konum, cihaz ve tıklamalar; hangi kanaldan iş geldiğini görmeniz içindir.</span></div>';
+  h+='<div class="kpis">'+kpi("Toplam ziyaret",String(total),I.chart,'<span class="mut">Tüm zamanlar</span>')+kpi("Benzersiz ziyaretçi",String(uniqN),I.users,'<span class="mut">Farklı cihaz/tarayıcı</span>')+kpi("Bugün",String(bugun),I.clock,'<span class="up">Bugün</span>')+kpi("Bu hafta",String(buhafta),I.clock,'<span class="mut">Son 7 gün</span>')+kpi("Tekrar gelen",String(tekrarN),I.users,'<span class="mut">Daha önce gelmiş</span>')+'</div>';
+  h+='<div class="apanel" style="margin-top:16px"><div class="ph"><h3>Ziyaretçi aksiyonları</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">Sitede yapılan tıklamalar</span></div><div class="pb"><div class="kpis">'+kpi("Ara tıklama",String(ev.ara),I.send,'<span class="mut">tel: linkine basıldı</span>')+kpi("WhatsApp",String(ev.whatsapp),I.msg,'<span class="mut">WhatsApp butonu</span>')+kpi("Yol tarifi",String(ev.yol),I.tag,'<span class="mut">Haritada aç / yol</span>')+kpi("Talep formu",String(ev.talep),I.crm,'<span class="mut">Form gönderildi</span>')+'</div></div></div>';
+  h+='<div class="apanel" style="margin-top:16px"><div class="ph"><h3>Son 14 gün</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">Günlük ziyaret</span></div><div class="pb"><div id="vis1"></div></div></div>';
+  var kay=topCount(ziyaretler,function(z){return z.kaynak||"Doğrudan";});
+  var cih=topCount(ziyaretler,function(z){return z.cihaz||"—";});
+  var os=topCount(ziyaretler,function(z){return z.os||"—";});
+  var tarb=topCount(ziyaretler,function(z){return z.tarayici||"—";},6);
+  var sehirB=topCount(ziyaretler,function(z){return z.sehir;},10);
+  var bolgeB=topCount(ziyaretler,function(z){return z.bolge;},10);
+  h+='<div class="grid2" style="margin-top:16px"><div class="apanel"><div class="ph"><h3>Nereden geldi</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">Kaynak</span></div><div class="pb">'+breakdownBars(kay)+'</div></div><div class="apanel"><div class="ph"><h3>Hangi cihaz</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">Cihaz türü</span></div><div class="pb">'+breakdownBars(cih,"var(--brand-2)")+'</div></div></div>';
+  h+='<div class="grid2" style="margin-top:16px"><div class="apanel"><div class="ph"><h3>İşletim sistemi</h3></div><div class="pb">'+breakdownBars(os,"var(--brand-2)")+'</div></div><div class="apanel"><div class="ph"><h3>Tarayıcı</h3></div><div class="pb">'+breakdownBars(tarb,"var(--brand-2)")+'</div></div></div>';
+  h+='<div class="grid2" style="margin-top:16px"><div class="apanel"><div class="ph"><h3>Şehir</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">IP\'den yaklaşık</span></div><div class="pb">'+breakdownBars(sehirB,"#1F9D62")+'</div></div><div class="apanel"><div class="ph"><h3>İl / Bölge</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">IP\'den yaklaşık</span></div><div class="pb">'+breakdownBars(bolgeB,"#1F9D62")+'</div></div></div>';
+  var utm=topCount(ziyaretler,function(z){return z.utm_campaign;});
+  if(utm.length)h+='<div class="apanel" style="margin-top:16px"><div class="ph"><h3>Kampanya / etiket (UTM)</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">Etiketli linkler</span></div><div class="pb">'+breakdownBars(utm,"#C27C16")+'</div></div>';
+  h+='<div class="apanel" style="margin-top:16px"><div class="ph"><h3>Son ziyaretler</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">Son 40 kayıt</span></div><div class="tablewrap"><table><thead><tr><th>Tarih / Saat</th><th>Kaynak</th><th>Konum</th><th>Cihaz</th><th>Tarayıcı</th><th>Durum</th></tr></thead><tbody>'+ziyaretRows()+'</tbody></table></div></div>';
   return h;
 };
-function ziyaretRows(){if(!ziyaretler.length)return '<tr><td colspan="3" style="padding:18px"><span class="mut">Henüz ziyaret kaydı yok. Site ziyaret edildikçe burada görünür.</span></td></tr>';return ziyaretler.slice(0,30).map(function(z){var ref=z.referrer?esc(String(z.referrer)):"";var kaynak=ref?('<span class="sub2">'+ref.replace(/^https?:\/\//,"").slice(0,48)+'</span>'):'<span class="mut">Doğrudan</span>';return '<tr><td class="tnum sub2">'+fmtDate(z.created_at)+'</td><td class="sub2">'+(z.path?esc(String(z.path)):"/")+'</td><td>'+kaynak+'</td></tr>';}).join("");}
+function ziyaretRows(){if(!ziyaretler.length)return '<tr><td colspan="6" style="padding:18px"><span class="mut">Henüz ziyaret kaydı yok. Site ziyaret edildikçe burada görünür.</span></td></tr>';return ziyaretler.slice(0,40).map(function(z){
+  var kaynak=z.kaynak?esc(String(z.kaynak)):'<span class="mut">Doğrudan</span>';
+  var utm=z.utm_campaign?' <span class="sub2">· '+esc(String(z.utm_campaign))+'</span>':'';
+  var kon=[z.sehir,z.bolge].filter(function(x,i,a){return x&&a.indexOf(x)===i;}).map(function(x){return esc(String(x));}).join(" / ");
+  return '<tr><td class="tnum sub2">'+fmtDate(z.created_at)+'</td><td>'+kaynak+utm+'</td><td class="sub2">'+(kon||'<span class="mut">—</span>')+'</td><td class="sub2">'+(z.cihaz?esc(String(z.cihaz)):"—")+(z.os?' · '+esc(String(z.os)):"")+'</td><td class="sub2">'+(z.tarayici?esc(String(z.tarayici)):"—")+'</td><td class="sub2">'+(z.tekrar?'Tekrar':'Yeni')+'</td></tr>';}).join("");}
 V.talepler=function(){return '<div class="sec-head"><span class="note">'+ic(I.crm)+' Durum değiştirince huni + Panel güncellenir, kayıt tarayıcınıza yazılır.</span><div class="sp"></div><button class="asmbtn primary asmbtn tiny" data-add="talep">'+ic(I.plus)+' Yeni talep</button></div><div class="apanel"><div class="tablewrap"><table><thead><tr><th>Müşteri</th><th>Hizmet</th><th>İlçe</th><th>Kaynak</th><th>Tarih</th><th>Tutar</th><th>Durum</th><th></th></tr></thead><tbody id="talepBody">'+talepRows()+'</tbody></table></div></div>';};
 function talepRows(){return C.talepler.map(function(t){return '<tr><td class="cust">'+t.ad+'<div class="sub2 tnum">'+t.tel+'</div></td><td>'+t.hiz+'</td><td>'+t.ilce+'</td><td class="sub2">'+t.kaynak+'</td><td class="tnum">'+t.t+'</td><td class="tnum">'+(t.tutar?TL(t.tutar):"—")+'</td><td><select class="statusel" data-id="'+t.id+'">'+DURUMLAR.map(function(d){return '<option'+(d===t.durum?' selected':'')+'>'+d+'</option>';}).join("")+'</select></td><td><div style="display:flex;gap:6px"><button class="iconbtn" title="WhatsApp mesajı gönder" data-wa="t:'+t.id+'" style="color:#1F9D62">'+WA_ICON+'</button><button class="iconbtn" title="Teklif oluştur (PDF)" data-teklif="'+t.id+'">'+ic(I.cms)+'</button></div></td></tr>';}).join("");}
 
@@ -1295,7 +1315,8 @@ function loadData(){
     sb.from("hareketler").select("*").order("tarih",{ascending:false}),
     sb.from("faturalar").select("*").order("created_at",{ascending:false}),
     sb.from("profiles").select("*").order("created_at"),
-    sb.from("ziyaretler").select("*").order("created_at",{ascending:false}).limit(3000)
+    sb.from("ziyaretler").select("*").order("created_at",{ascending:false}).limit(3000),
+    sb.from("olaylar").select("*").order("created_at",{ascending:false}).limit(3000)
   ]).then(function(res){
     if(res[0]&&res[0].data)C.talepler=res[0].data.map(mapTalep);
     if(res[1]&&res[1].data)C.mesajlar=res[1].data.map(mapMesaj);
@@ -1305,6 +1326,7 @@ function loadData(){
     if(res[5]&&res[5].data)faturalar=res[5].data.map(mapFatura);
     if(res[6]&&res[6].data)kullanicilar=res[6].data.map(mapUser);
     if(res[7]&&res[7].data)ziyaretler=res[7].data;
+    if(res[8]&&res[8].data)olaylar=res[8].data;
   }).catch(function(e){console.warn("loadData",e);});
 }
 function onRealtime(){loadData().then(function(){buildNav();if(curView==="dash"||curView==="talepler"||curView==="mesajlar")go(curView);});}
@@ -1393,14 +1415,94 @@ window.addEventListener("hashchange",function(){if(location.hash==="#yonetim")op
   setTimeout(openW, reduce?300:1100);
 })();
 
-/* ===== ziyaretçi sayacı ===== */
+/* ===== ziyaretçi & kaynak takibi ===== */
+function visDevice(){
+  var ua=navigator.userAgent||"", cihaz="Masaüstü", os="Diğer", tar="Diğer";
+  if(/iPad|Tablet|PlayBook|Silk/i.test(ua)||(/Android/i.test(ua)&&!/Mobile/i.test(ua)))cihaz="Tablet";
+  else if(/Mobi|iPhone|Android.*Mobile|Windows Phone|iPod/i.test(ua))cihaz="Mobil";
+  if(/Android/i.test(ua))os="Android";
+  else if(/iPhone|iPad|iPod/i.test(ua))os="iOS";
+  else if(/Windows/i.test(ua))os="Windows";
+  else if(/Mac OS X|Macintosh/i.test(ua))os="macOS";
+  else if(/Linux/i.test(ua))os="Linux";
+  if(/Edg\//i.test(ua))tar="Edge";
+  else if(/SamsungBrowser/i.test(ua))tar="Samsung Internet";
+  else if(/OPR\/|Opera/i.test(ua))tar="Opera";
+  else if(/Firefox\//i.test(ua))tar="Firefox";
+  else if(/Chrome\//i.test(ua)&&!/Chromium/i.test(ua))tar="Chrome";
+  else if(/Safari\//i.test(ua)&&/Version\//i.test(ua))tar="Safari";
+  return {cihaz:cihaz,os:os,tar:tar};
+}
+function visKaynak(ref,utmSource){
+  if(utmSource){var m={whatsapp:"WhatsApp",wa:"WhatsApp",instagram:"Instagram",ig:"Instagram",facebook:"Facebook",fb:"Facebook",google:"Google",gbp:"Google İşletme","google-business":"Google İşletme",maps:"Google Haritalar",email:"E-posta",eposta:"E-posta",sms:"SMS",qr:"QR Kod",kartvizit:"Kartvizit"};var k=String(utmSource).toLowerCase();return m[k]||("Etiket: "+utmSource);}
+  if(!ref)return "Doğrudan";
+  var host="";try{host=new URL(ref).hostname.replace(/^www\./,"").toLowerCase();}catch(e){host=String(ref).toLowerCase();}
+  if(/(^|\.)google\./.test(host))return "Google";
+  if(/bing\./.test(host))return "Bing";
+  if(/yandex\./.test(host))return "Yandex";
+  if(/duckduckgo/.test(host))return "DuckDuckGo";
+  if(/instagram\.|l\.instagram/.test(host))return "Instagram";
+  if(/facebook\.|^fb\.|l\.facebook|lm\.facebook/.test(host))return "Facebook";
+  if(/wa\.me|whatsapp/.test(host))return "WhatsApp";
+  if(/youtube\.|youtu\.be/.test(host))return "YouTube";
+  if(/t\.co|twitter\.|x\.com/.test(host))return "X (Twitter)";
+  if(/linkedin\./.test(host))return "LinkedIn";
+  if(/tiktok\./.test(host))return "TikTok";
+  if(/bdriklimlendirme/.test(host))return "İç sayfa";
+  return host || "Diğer";
+}
+function logEvent(tur,detay){try{
+  if(!sb)return;
+  var vid=localStorage.getItem("bdr-vid")||"";
+  var kaynak=sessionStorage.getItem("bdr-kaynak")||"";
+  sb.from("olaylar").insert({vid:vid,tur:tur,detay:String(detay||"").slice(0,200),kaynak:kaynak}).catch(function(){});
+}catch(e){}}
+function getGeo(cb){
+  /* IP'den yaklaşık şehir/il — IP saklanmaz, sonuç 24s önbelleğe alınır */
+  try{var raw=localStorage.getItem("bdr-geo");if(raw){var g=JSON.parse(raw);if(g&&g.ts&&(Date.now()-g.ts<86400000)){cb(g);return;}}}catch(e){}
+  var done=false,to=setTimeout(function(){if(!done){done=true;cb(null);}},2500);
+  try{
+    fetch("https://ipwho.is/").then(function(r){return r.json();}).then(function(d){
+      if(done)return;done=true;clearTimeout(to);
+      if(d&&d.success!==false){var g={sehir:(d.city||"").slice(0,80),bolge:(d.region||"").slice(0,80),ulke:(d.country||"").slice(0,80),ts:Date.now()};try{localStorage.setItem("bdr-geo",JSON.stringify(g));}catch(e){}cb(g);}
+      else cb(null);
+    }).catch(function(){if(done)return;done=true;clearTimeout(to);cb(null);});
+  }catch(e){if(!done){done=true;clearTimeout(to);cb(null);}}
+}
 function trackVisit(){try{
   if(!sb)return;
   if(location.hash==="#yonetim")return; /* panel açılışını sayma */
-  if(sessionStorage.getItem("bdr-visit"))return; /* aynı oturumda tek kez */
   var vid=localStorage.getItem("bdr-vid");
+  var tekrar=!!vid; /* daha önce bu cihazdan gelinmiş mi */
   if(!vid){vid=Date.now().toString(36)+Math.random().toString(36).slice(2,10);try{localStorage.setItem("bdr-vid",vid);}catch(e){}}
-  sb.from("ziyaretler").insert({vid:vid,path:(location.pathname||"/"),referrer:(document.referrer||"").slice(0,300)}).then(function(r){if(r&&!r.error){try{sessionStorage.setItem("bdr-visit","1");}catch(e){}}}).catch(function(){});
+  var qs;try{qs=new URLSearchParams(location.search||"");}catch(e){qs=null;}
+  var utmS=qs?(qs.get("utm_source")||""):"", utmM=qs?(qs.get("utm_medium")||""):"", utmC=qs?(qs.get("utm_campaign")||""):"";
+  var ref=(document.referrer||"");
+  var kaynak=visKaynak(ref,utmS);
+  try{sessionStorage.setItem("bdr-kaynak",kaynak);}catch(e){}
+  if(sessionStorage.getItem("bdr-visit"))return; /* aynı oturumda tek kez say */
+  var d=visDevice();
+  getGeo(function(g){
+    var rec={vid:vid,path:(location.pathname||"/"),referrer:ref.slice(0,300),
+      kaynak:kaynak,utm_source:utmS||null,utm_medium:utmM||null,utm_campaign:utmC||null,
+      cihaz:d.cihaz,os:d.os,tarayici:d.tar,dil:(navigator.language||"").slice(0,12),
+      ekran:(window.screen&&screen.width&&screen.height?(screen.width+"x"+screen.height):null),
+      landing:(location.hash||"").slice(0,40)||null,tekrar:tekrar,
+      sehir:(g&&g.sehir)||null,bolge:(g&&g.bolge)||null,ulke:(g&&g.ulke)||null};
+    sb.from("ziyaretler").insert(rec).then(function(r){if(r&&!r.error){try{sessionStorage.setItem("bdr-visit","1");}catch(e){}}}).catch(function(){});
+  });
+}catch(e){}}
+/* tıklama olayları: Ara / WhatsApp / Yol tarifi */
+function wireEvents(){try{
+  document.addEventListener("click",function(e){
+    var a=(e.target&&e.target.closest)?e.target.closest("a,button"):null;if(!a)return;
+    var href=(a.getAttribute&&a.getAttribute("href"))||"";
+    var cls=a.className&&a.className.indexOf?a.className:"";
+    if(/^tel:/i.test(href)){logEvent("ara",href.replace(/^tel:/i,""));return;}
+    if(a.classList&&a.classList.contains("wsvc")){logEvent("whatsapp","Popup: "+(a.getAttribute("data-svc")||""));return;}
+    if(/wa\.me|api\.whatsapp/i.test(href)||(a.classList&&a.classList.contains("jsWa"))){logEvent("whatsapp",href.slice(0,120));return;}
+    if(/google\.com\/maps/i.test(href)){logEvent("yol",/dir/.test(href)?"Yol tarifi":"Haritada aç");return;}
+  },true);
 }catch(e){}}
 
 /* ===== init ===== */
@@ -1408,6 +1510,7 @@ applyContent();
 countUp();
 loadContent().then(function(){applyContent();});
 trackVisit();
+wireEvents();
 if(location.hash==="#yonetim")openAdmin();
 })();
 </script>
