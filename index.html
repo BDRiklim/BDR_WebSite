@@ -1067,7 +1067,7 @@ V.istatistik=function(){
   ziyaretler.forEach(function(z){if(z.vid)uniq[z.vid]=1;if(z.tekrar)tekrarN++;if(!z.created_at)return;var d=new Date(z.created_at);if(sameDay(d))bugun++;if(d>=hafta)buhafta++;if(d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear())buay++;});
   var uniqN=Object.keys(uniq).length;
   var ev={ara:0,whatsapp:0,yol:0,talep:0};olaylar.forEach(function(o){if(ev[o.tur]!=null)ev[o.tur]++;});
-  var h='<div class="sec-head"><span class="note">'+ic(I.chart)+' Ziyaretler anonim toplanır — isim/telefon alınmaz, IP adresi saklanmaz. Şehir/il IP\'den yaklaşık tahmindir (il genelde doğru, ilçe değişebilir). Kaynak, konum, cihaz ve tıklamalar; hangi kanaldan iş geldiğini görmeniz içindir.</span></div>';
+  var h='<div class="sec-head"><span class="note">'+ic(I.chart)+' Ziyaretler anonim toplanır — isim/telefon alınmaz, IP adresi saklanmaz. Konum IP\'den yaklaşık tahmindir — il genelde doğru, ilçe bazen il merkezi/operatör konumu çıkabilir. Kaynak, konum, cihaz ve tıklamalar; hangi kanaldan iş geldiğini görmeniz içindir.</span></div>';
   h+='<div class="kpis">'+kpi("Toplam ziyaret",String(total),I.chart,'<span class="mut">Tüm zamanlar</span>')+kpi("Benzersiz ziyaretçi",String(uniqN),I.users,'<span class="mut">Farklı cihaz/tarayıcı</span>')+kpi("Bugün",String(bugun),I.clock,'<span class="up">Bugün</span>')+kpi("Bu hafta",String(buhafta),I.clock,'<span class="mut">Son 7 gün</span>')+kpi("Tekrar gelen",String(tekrarN),I.users,'<span class="mut">Daha önce gelmiş</span>')+'</div>';
   h+='<div class="apanel" style="margin-top:16px"><div class="ph"><h3>Ziyaretçi aksiyonları</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">Sitede yapılan tıklamalar</span></div><div class="pb"><div class="kpis">'+kpi("Ara tıklama",String(ev.ara),I.send,'<span class="mut">tel: linkine basıldı</span>')+kpi("WhatsApp",String(ev.whatsapp),I.msg,'<span class="mut">WhatsApp butonu</span>')+kpi("Yol tarifi",String(ev.yol),I.tag,'<span class="mut">Haritada aç / yol</span>')+kpi("Talep formu",String(ev.talep),I.crm,'<span class="mut">Form gönderildi</span>')+'</div></div></div>';
   h+='<div class="apanel" style="margin-top:16px"><div class="ph"><h3>Son 14 gün</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">Günlük ziyaret</span></div><div class="pb"><div id="vis1"></div></div></div>';
@@ -1075,11 +1075,11 @@ V.istatistik=function(){
   var cih=topCount(ziyaretler,function(z){return z.cihaz||"—";});
   var os=topCount(ziyaretler,function(z){return z.os||"—";});
   var tarb=topCount(ziyaretler,function(z){return z.tarayici||"—";},6);
-  var sehirB=topCount(ziyaretler,function(z){return z.sehir;},10);
-  var bolgeB=topCount(ziyaretler,function(z){return z.bolge;},10);
+  var ilceB=topCount(ziyaretler,function(z){return z.sehir;},10);
+  var ilB=topCount(ziyaretler,function(z){return z.bolge;},10);
   h+='<div class="grid2" style="margin-top:16px"><div class="apanel"><div class="ph"><h3>Nereden geldi</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">Kaynak</span></div><div class="pb">'+breakdownBars(kay)+'</div></div><div class="apanel"><div class="ph"><h3>Hangi cihaz</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">Cihaz türü</span></div><div class="pb">'+breakdownBars(cih,"var(--brand-2)")+'</div></div></div>';
   h+='<div class="grid2" style="margin-top:16px"><div class="apanel"><div class="ph"><h3>İşletim sistemi</h3></div><div class="pb">'+breakdownBars(os,"var(--brand-2)")+'</div></div><div class="apanel"><div class="ph"><h3>Tarayıcı</h3></div><div class="pb">'+breakdownBars(tarb,"var(--brand-2)")+'</div></div></div>';
-  h+='<div class="grid2" style="margin-top:16px"><div class="apanel"><div class="ph"><h3>Şehir</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">IP\'den yaklaşık</span></div><div class="pb">'+breakdownBars(sehirB,"#1F9D62")+'</div></div><div class="apanel"><div class="ph"><h3>İl / Bölge</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">IP\'den yaklaşık</span></div><div class="pb">'+breakdownBars(bolgeB,"#1F9D62")+'</div></div></div>';
+  h+='<div class="grid2" style="margin-top:16px"><div class="apanel"><div class="ph"><h3>İl</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">IP\'den yaklaşık</span></div><div class="pb">'+breakdownBars(ilB,"#1F9D62")+'</div></div><div class="apanel"><div class="ph"><h3>İlçe <span class="mut" style="font-weight:600">(yaklaşık)</span></h3><div class="sp"></div><span class="mut" style="font-size:.8rem">IP tahmini · il merkezi çıkabilir</span></div><div class="pb">'+breakdownBars(ilceB,"#C27C16")+'</div></div></div>';
   var utm=topCount(ziyaretler,function(z){return z.utm_campaign;});
   if(utm.length)h+='<div class="apanel" style="margin-top:16px"><div class="ph"><h3>Kampanya / etiket (UTM)</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">Etiketli linkler</span></div><div class="pb">'+breakdownBars(utm,"#C27C16")+'</div></div>';
   h+='<div class="apanel" style="margin-top:16px"><div class="ph"><h3>Son ziyaretler</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">Son 40 kayıt</span></div><div class="tablewrap"><table><thead><tr><th>Tarih / Saat</th><th>Kaynak</th><th>Konum</th><th>Cihaz</th><th>Tarayıcı</th><th>Durum</th></tr></thead><tbody>'+ziyaretRows()+'</tbody></table></div></div>';
@@ -1088,7 +1088,7 @@ V.istatistik=function(){
 function ziyaretRows(){if(!ziyaretler.length)return '<tr><td colspan="6" style="padding:18px"><span class="mut">Henüz ziyaret kaydı yok. Site ziyaret edildikçe burada görünür.</span></td></tr>';return ziyaretler.slice(0,40).map(function(z){
   var kaynak=z.kaynak?esc(String(z.kaynak)):'<span class="mut">Doğrudan</span>';
   var utm=z.utm_campaign?' <span class="sub2">· '+esc(String(z.utm_campaign))+'</span>':'';
-  var kon=[z.sehir,z.bolge].filter(function(x,i,a){return x&&a.indexOf(x)===i;}).map(function(x){return esc(String(x));}).join(" / ");
+  var kon=[z.bolge,z.sehir].filter(function(x,i,a){return x&&a.indexOf(x)===i;}).map(function(x){return esc(String(x));}).join(" / ");
   return '<tr><td class="tnum sub2">'+fmtDate(z.created_at)+'</td><td>'+kaynak+utm+'</td><td class="sub2">'+(kon||'<span class="mut">—</span>')+'</td><td class="sub2">'+(z.cihaz?esc(String(z.cihaz)):"—")+(z.os?' · '+esc(String(z.os)):"")+'</td><td class="sub2">'+(z.tarayici?esc(String(z.tarayici)):"—")+'</td><td class="sub2">'+(z.tekrar?'Tekrar':'Yeni')+'</td></tr>';}).join("");}
 V.talepler=function(){return '<div class="sec-head"><span class="note">'+ic(I.crm)+' Durum değiştirince huni + Panel güncellenir, kayıt tarayıcınıza yazılır.</span><div class="sp"></div><button class="asmbtn primary asmbtn tiny" data-add="talep">'+ic(I.plus)+' Yeni talep</button></div><div class="apanel"><div class="tablewrap"><table><thead><tr><th>Müşteri</th><th>Hizmet</th><th>İlçe</th><th>Kaynak</th><th>Tarih</th><th>Tutar</th><th>Durum</th><th></th></tr></thead><tbody id="talepBody">'+talepRows()+'</tbody></table></div></div>';};
 function talepRows(){return C.talepler.map(function(t){return '<tr><td class="cust">'+t.ad+'<div class="sub2 tnum">'+t.tel+'</div></td><td>'+t.hiz+'</td><td>'+t.ilce+'</td><td class="sub2">'+t.kaynak+'</td><td class="tnum">'+t.t+'</td><td class="tnum">'+(t.tutar?TL(t.tutar):"—")+'</td><td><select class="statusel" data-id="'+t.id+'">'+DURUMLAR.map(function(d){return '<option'+(d===t.durum?' selected':'')+'>'+d+'</option>';}).join("")+'</select></td><td><div style="display:flex;gap:6px"><button class="iconbtn" title="WhatsApp mesajı gönder" data-wa="t:'+t.id+'" style="color:#1F9D62">'+WA_ICON+'</button><button class="iconbtn" title="Teklif oluştur (PDF)" data-teklif="'+t.id+'">'+ic(I.cms)+'</button></div></td></tr>';}).join("");}
@@ -1461,24 +1461,25 @@ function getGeo(cb){
   /* IP'den yaklaşık şehir/il — IP saklanmaz, sonuç 24s önbelleğe alınır. Yedekli sağlayıcı zinciri. */
   try{var raw=localStorage.getItem("bdr-geo");if(raw){var g=JSON.parse(raw);if(g&&g.ts&&(Date.now()-g.ts<86400000)){cb(g);return;}}}catch(e){}
   var providers=[
-    {u:"https://get.geojs.io/v1/ip/geo.json",m:function(d){return{sehir:d.city,bolge:d.region,ulke:d.country};}},
-    {u:"https://ipapi.co/json/",m:function(d){return(d&&!d.error)?{sehir:d.city,bolge:d.region,ulke:d.country_name}:null;}},
-    {u:"https://freeipapi.com/api/json",m:function(d){return{sehir:d.cityName,bolge:d.regionName,ulke:d.countryName};}}
+    {u:"https://get.geojs.io/v1/ip/geo.json",m:function(d){return{ilce:d.city,il:d.region,ulke:d.country};}},
+    {u:"https://ipapi.co/json/",m:function(d){return(d&&!d.error)?{ilce:d.city,il:d.region,ulke:d.country_name}:null;}},
+    {u:"https://freeipapi.com/api/json",m:function(d){return{ilce:d.cityName,il:d.regionName,ulke:d.countryName};}}
   ];
-  var done=false,to=setTimeout(function(){if(!done){done=true;cb(null);}},4000);
-  function clean(s){return s?String(s).replace(/\s*(Province|İli|Ili)$/i,"").trim().slice(0,80):"";}
-  function fin(g){if(done)return;done=true;clearTimeout(to);if(g){try{localStorage.setItem("bdr-geo",JSON.stringify(g));}catch(e){}}cb(g);}
-  function tryP(i){
-    if(done)return;
-    if(i>=providers.length){fin(null);return;}
-    var p=providers[i];
-    fetch(p.u).then(function(r){return r.ok?r.json():Promise.reject(r.status);}).then(function(d){
-      var g=p.m(d);
-      if(g&&(g.sehir||g.bolge))fin({sehir:clean(g.sehir),bolge:clean(g.bolge),ulke:clean(g.ulke),ts:Date.now()});
-      else tryP(i+1);
-    }).catch(function(){tryP(i+1);});
+  function clean(s){return s?String(s).replace(/\s*(Province|İli|Ili|Bölgesi)$/i,"").trim().slice(0,80):"";}
+  var done=false,results=[],pending=providers.length,to=setTimeout(finish,4500);
+  function finish(){
+    if(done)return;done=true;clearTimeout(to);
+    var pick=null,i;
+    /* önce ilçe (city) ile il (region) farklı olan = gerçek ilçe veren sonucu tercih et */
+    for(i=0;i<results.length;i++){var r=results[i];if(r&&r.ilce&&clean(r.ilce).toLowerCase()!==clean(r.il).toLowerCase()){pick=r;break;}}
+    if(!pick)for(i=0;i<results.length;i++){if(results[i]&&(results[i].ilce||results[i].il)){pick=results[i];break;}}
+    var g=pick?{sehir:clean(pick.ilce),bolge:clean(pick.il),ulke:clean(pick.ulke),ts:Date.now()}:null;
+    if(g){try{localStorage.setItem("bdr-geo",JSON.stringify(g));}catch(e){}}
+    cb(g);
   }
-  tryP(0);
+  providers.forEach(function(p,idx){
+    fetch(p.u).then(function(r){return r.ok?r.json():Promise.reject();}).then(function(d){results[idx]=p.m(d);}).catch(function(){results[idx]=null;}).then(function(){if(--pending<=0)finish();});
+  });
 }
 function trackVisit(){try{
   if(!sb)return;
