@@ -312,6 +312,26 @@ footer a:hover{color:var(--band-fg)}
 #admin .abtn-sm{padding:.4em .7em;font-size:.78rem}
 #admin .tb-ic{width:40px;height:40px;border-radius:9px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;position:relative;color:var(--ink-2);cursor:pointer}
 #admin .tb-ic .dot{position:absolute;top:8px;right:9px;width:7px;height:7px;background:var(--bad);border-radius:50%;border:2px solid var(--surface)}
+#admin .kpi.clk{cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s}
+#admin .kpi.clk:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--brand)}
+#admin .kpi.clk:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+#admin .notifwrap{position:relative;display:flex}
+#admin .notifpanel{position:absolute;top:calc(100% + 8px);right:0;width:330px;max-width:calc(100vw - 32px);background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);z-index:80;overflow:hidden;display:none}
+#admin .notifpanel.open{display:block}
+#admin .notifhd{padding:12px 15px;font-weight:700;font-size:.92rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+#admin .notifhd .sp{flex:1}
+#admin .notifhd .cnt{font-size:.72rem;font-weight:700;color:#fff;background:var(--brand);border-radius:999px;padding:.05em .55em;min-width:20px;text-align:center}
+#admin .notiflist{max-height:60vh;overflow:auto}
+#admin .notifitem{display:flex;align-items:center;gap:11px;width:100%;text-align:left;border:none;background:none;padding:11px 15px;cursor:pointer;border-bottom:1px solid var(--line);color:var(--ink)}
+#admin .notifitem:last-child{border-bottom:none}
+#admin .notifitem:hover{background:rgba(91,141,240,.08)}
+#admin .notifitem .ni{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;flex-shrink:0;background:var(--tint);color:var(--brand)}
+#admin .notifitem .ni.warn{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+#admin .notifitem .ni.bad{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+#admin .notifitem .nt{display:flex;flex-direction:column;gap:2px;min-width:0}
+#admin .notifitem .nt b{font-size:.86rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#admin .notifitem .nt .ns{font-size:.76rem;color:var(--muted)}
+#admin .notifempty{padding:26px 15px;text-align:center;color:var(--muted);font-size:.86rem}
 #admin .aburger{display:none}
 #admin .content{padding:clamp(16px,3vw,28px);max-width:1280px;width:100%}
 #admin .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
@@ -700,7 +720,10 @@ footer a:hover{color:var(--band-fg)}
         <div class="sp"></div>
         <button class="abtn" id="viewSite"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg> Siteyi Görüntüle</button>
         <button class="abtn" id="logoutBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg> Çıkış</button>
-        <button class="tb-ic" aria-label="Bildirimler"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot"></span></button>
+        <div class="notifwrap">
+          <button class="tb-ic" id="notifBtn" aria-label="Bildirimler" aria-haspopup="true" aria-expanded="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot" id="notifDot" style="display:none"></span></button>
+          <div class="notifpanel" id="notifPanel"></div>
+        </div>
       </div>
       <div class="content" id="acontent"></div>
     </div>
@@ -1036,7 +1059,7 @@ function wireVisit(root,data){var tip=$("#ttip");$$("rect.barm",root).forEach(fu
 
 function pill(t,c){return '<span class="pill '+c+'">'+t+'</span>';}
 function counts(){var c={Yeni:0,"Arandı":0,"Teklif Verildi":0,"Kazanıldı":0,"Kaybedildi":0};C.talepler.forEach(function(t){if(c[t.durum]!=null)c[t.durum]++;});return c;}
-function kpi(t,v,icon,d){return '<div class="kpi"><div class="t">'+t+'<span class="i">'+ic(icon)+'</span></div><div class="v tnum">'+v+'</div><div class="d">'+d+'</div></div>';}
+function kpi(t,v,icon,d,go){var a=go?' clk" data-go="'+go+'" role="button" tabindex="0" title="'+t+' ekranına git"':'"';return '<div class="kpi'+a+'><div class="t">'+t+'<span class="i">'+ic(icon)+'</span></div><div class="v tnum">'+v+'</div><div class="d">'+d+'</div></div>';}
 
 function barChart(data,labels){
   var W=640,H=230,pl=44,pr=14,pt=16,pb=28,iw=W-pl-pr,ih=H-pt-pb,max=Math.max.apply(null,data)*1.12,bw=iw/data.length,g,gy,val,grid="",bars="";
@@ -1051,7 +1074,8 @@ V.dash=function(){
   var c=counts();
   var now=new Date();var buay=hareketler.filter(function(x){var d=x.tarih?new Date(x.tarih):null;return x.y>0&&d&&d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).reduce(function(a,x){return a+x.v;},0);
   var hat=bakimHatirlatmalar();
-  var h=(roleCan("bakim")?hatirlatPanel():'')+'<div class="kpis">'+kpi("Bu ay ciro",TL(buay),I.money,'<span class="mut">Muhasebeden</span>')+kpi("Bekleyen teklif",String(c["Teklif Verildi"]),I.crm,'<span class="mut">Takip gerekiyor</span>')+kpi("Yeni talep",String(c.Yeni),I.msg,'<span class="up">Panelde</span>')+kpi("Bakım kaydı",String(bakimlar.length)+" cihaz",I.wrench,(hat.length?'<span class="down">'+hat.length+' hatırlatma</span>':'<span class="mut">Hatırlatma yok</span>'))+kpi("Kazanılan iş",String(c["Kazanıldı"]),I.check,'<span class="mut">Toplam</span>')+'</div>';
+  var gMuh=roleCan("muhasebe")?"muhasebe":"",gTal=roleCan("talepler")?"talepler":"",gBak=roleCan("bakim")?"bakim":"";
+  var h=(roleCan("bakim")?hatirlatPanel():'')+'<div class="kpis">'+kpi("Bu ay ciro",TL(buay),I.money,'<span class="mut">Muhasebeden</span>',gMuh)+kpi("Bekleyen teklif",String(c["Teklif Verildi"]),I.crm,'<span class="mut">Takip gerekiyor</span>',gTal)+kpi("Yeni talep",String(c.Yeni),I.msg,'<span class="up">Panelde</span>',gTal)+kpi("Bakım kaydı",String(bakimlar.length)+" cihaz",I.wrench,(hat.length?'<span class="down">'+hat.length+' hatırlatma</span>':'<span class="mut">Hatırlatma yok</span>'),gBak)+kpi("Kazanılan iş",String(c["Kazanıldı"]),I.check,'<span class="mut">Toplam</span>',gTal)+'</div>';
   h+='<div class="grid2"><div class="apanel"><div class="ph"><h3>Aylık ciro</h3><div class="sp"></div><span class="mut" style="font-size:.8rem">Son 8 ay · bin ₺</span></div><div class="pb"><div id="rev1"></div></div></div><div class="apanel"><div class="ph"><h3>Satış hunisi</h3><div class="sp"></div><span class="link" data-go="talepler">Tümü →</span></div><div class="pb">'+pipe(c)+'</div></div></div>';
   h+='<div class="grid2"><div class="apanel"><div class="ph"><h3>Son talepler</h3><div class="sp"></div><span class="link" data-go="talepler">Tümü →</span></div><div class="tablewrap"><table><thead><tr><th>Müşteri</th><th>Hizmet</th><th>Durum</th><th>Tutar</th></tr></thead><tbody>'+C.talepler.slice(0,5).map(function(t){return '<tr><td class="cust">'+t.ad+'<div class="sub2">'+t.ilce+' · '+t.t+'</div></td><td>'+t.hiz+'</td><td>'+pill(t.durum,durumCls[t.durum])+'</td><td class="tnum">'+(t.tutar?TL(t.tutar):"—")+'</td></tr>';}).join("")+'</tbody></table></div></div><div class="apanel"><div class="ph"><h3>Yaklaşan bakımlar</h3><div class="sp"></div><span class="link" data-go="bakim">Tümü →</span></div><div class="tablewrap"><table><thead><tr><th>Müşteri</th><th>Cihaz</th><th>Tarih</th><th>Durum</th></tr></thead><tbody>'+(bakimlar.length?bakimlar.slice(0,5).map(function(b){var u=bakimUyari(b);return '<tr><td class="cust">'+esc(b.ad)+'</td><td class="sub2">'+esc(b.cihaz)+'</td><td class="tnum">'+fmtD(b.sonraki)+(u?'<div class="sub2" style="color:var(--'+(u.lvl==="w1"?"warn":"bad")+');font-weight:700">'+u.kisa+'</div>':'')+'</td><td>'+pill(b.durum,bakimCls[b.durum]||"p-neutral")+'</td></tr>';}).join(""):'<tr><td colspan="4" style="padding:14px"><span class="mut">Bakım kaydı yok</span></td></tr>')+'</tbody></table></div></div></div>';
   return h;
@@ -1175,8 +1199,8 @@ V.ayarlar=function(){var ay=C.ayarlar||{};var entg=[{ad:"WhatsApp (yarı-otomati
 function saveWaTpl(){function g(id){var e=$("#"+id);return e?e.value:"";}C.waTemplates={karsilama:g("wt_karsilama"),randevu:g("wt_randevu"),teklif:g("wt_teklif"),bakim:g("wt_bakim")};save();toast("WhatsApp şablonları kaydedildi");}
 
 /* nav + router */
-function buildNav(){var c=counts(),h="";NAV.forEach(function(g){var gi="";g.items.forEach(function(it){if(!roleCan(it[0]))return;var badge="";if(it[3]==="crm")badge='<span class="badge">'+(c.Yeni+c["Arandı"])+'</span>';if(it[3]==="msg")badge='<span class="badge">'+C.mesajlar.filter(function(m){return !m.okundu;}).length+'</span>';if(it[0]==="bakim"){var bhc=bakimHatirlatmalar().length;if(bhc)badge='<span class="badge">'+bhc+'</span>';}gi+='<button class="navlink" data-view="'+it[0]+'">'+ic(it[2])+'<span>'+it[1]+'</span>'+badge+'</button>';});if(gi)h+='<div class="navgrp"><div class="lbl">'+g.grp+'</div>'+gi+'</div>';});$("#nav").innerHTML=h;}
-function go(v){if(!V[v])v="dash";if(!roleCan(v))v="dash";curView=v;$$("#admin .navlink").forEach(function(n){n.classList.toggle("active",n.getAttribute("data-view")===v);});$("#pgTitle").textContent=TITLES[v][0];$("#pgSub").textContent=TITLES[v][1];$("#acontent").innerHTML=V[v]();if(v==="dash"){var ag=aylikGelir();var r=$("#rev1");r.innerHTML=barChart(ag.data,ag.labels);wireChart(r,ag.data);}if(v==="muhasebe"){wireMuhasebe();}if(v==="istatistik"){var zg=ziyaretGunluk(),rv=$("#vis1");if(rv){if(zg.data.reduce(function(a,b){return a+b;},0)>0){rv.innerHTML=barChart(zg.data,zg.labels);wireVisit(rv,zg.data);}else{rv.innerHTML='<div style="padding:30px;text-align:center" class="mut">Henüz ziyaret verisi yok. Site ziyaret edildikçe burada görünür.</div>';}}}closeSide();$("#admin").scrollTop=0;}
+function buildNav(){var c=counts(),h="";NAV.forEach(function(g){var gi="";g.items.forEach(function(it){if(!roleCan(it[0]))return;var badge="";if(it[3]==="crm")badge='<span class="badge">'+(c.Yeni+c["Arandı"])+'</span>';if(it[3]==="msg")badge='<span class="badge">'+C.mesajlar.filter(function(m){return !m.okundu;}).length+'</span>';if(it[0]==="bakim"){var bhc=bakimHatirlatmalar().length;if(bhc)badge='<span class="badge">'+bhc+'</span>';}gi+='<button class="navlink" data-view="'+it[0]+'">'+ic(it[2])+'<span>'+it[1]+'</span>'+badge+'</button>';});if(gi)h+='<div class="navgrp"><div class="lbl">'+g.grp+'</div>'+gi+'</div>';});$("#nav").innerHTML=h;renderNotif();}
+function go(v){if(!V[v])v="dash";if(!roleCan(v))v="dash";curView=v;$$("#admin .navlink").forEach(function(n){n.classList.toggle("active",n.getAttribute("data-view")===v);});$("#pgTitle").textContent=TITLES[v][0];$("#pgSub").textContent=TITLES[v][1];$("#acontent").innerHTML=V[v]();if(v==="dash"){var ag=aylikGelir();var r=$("#rev1");r.innerHTML=barChart(ag.data,ag.labels);wireChart(r,ag.data);}if(v==="muhasebe"){wireMuhasebe();}if(v==="istatistik"){var zg=ziyaretGunluk(),rv=$("#vis1");if(rv){if(zg.data.reduce(function(a,b){return a+b;},0)>0){rv.innerHTML=barChart(zg.data,zg.labels);wireVisit(rv,zg.data);}else{rv.innerHTML='<div style="padding:30px;text-align:center" class="mut">Henüz ziyaret verisi yok. Site ziyaret edildikçe burada görünür.</div>';}}}closeSide();closeNotif();$("#admin").scrollTop=0;}
 
 /* admin events */
 $("#admin").addEventListener("click",function(e){
@@ -1296,6 +1320,27 @@ function openAdd(key){var d=addDefs[key];if(!d)return;curAdd=d;$("#mTitle").text
 function closeSide(){$("#aside").classList.remove("open");$("#scrim2").classList.remove("show");}
 $("#aburger").addEventListener("click",function(){$("#aside").classList.add("open");$("#scrim2").classList.add("show");});
 $("#scrim2").addEventListener("click",closeSide);
+/* ===== Bildirim merkezi ===== */
+function notifList(){
+  var list=[];
+  if(roleCan("mesajlar")){var unread=C.mesajlar.filter(function(m){return !m.okundu;}).length;if(unread)list.push({icon:I.msg,title:unread+" yeni mesaj",sub:"Okunmamış iletişim mesajı",view:"mesajlar",lvl:"info"});}
+  if(roleCan("talepler")){var c=counts();if(c.Yeni)list.push({icon:I.crm,title:c.Yeni+" yeni talep",sub:"Henüz aranmadı — takip gerekiyor",view:"talepler",lvl:"info"});}
+  if(roleCan("bakim")){bakimHatirlatmalar().forEach(function(x){list.push({icon:I.wrench,title:(x.b.ad||"Bakım")+" · "+(x.b.cihaz||"cihaz"),sub:x.u.etiket,view:"bakim",lvl:(x.u.lvl==="w1"?"warn":"bad")});});}
+  return list;
+}
+function renderNotif(){
+  var list=notifList(),dot=$("#notifDot");
+  if(dot)dot.style.display=list.length?"block":"none";
+  var p=$("#notifPanel");if(!p)return;
+  var body=list.length?('<div class="notiflist">'+list.map(function(n){return '<button class="notifitem" data-go="'+n.view+'"><span class="ni '+n.lvl+'">'+ic(n.icon)+'</span><span class="nt"><b>'+esc(n.title)+'</b><span class="ns">'+esc(n.sub)+'</span></span></button>';}).join("")+'</div>'):'<div class="notifempty">Yeni bildirim yok</div>';
+  p.innerHTML='<div class="notifhd">Bildirimler<span class="sp"></span>'+(list.length?'<span class="cnt">'+list.length+'</span>':'')+'</div>'+body;
+}
+function closeNotif(){var p=$("#notifPanel"),b=$("#notifBtn");if(p)p.classList.remove("open");if(b)b.setAttribute("aria-expanded","false");}
+(function(){var b=$("#notifBtn");if(!b)return;b.addEventListener("click",function(e){e.stopPropagation();var p=$("#notifPanel");if(!p)return;if(p.classList.contains("open")){closeNotif();}else{renderNotif();p.classList.add("open");b.setAttribute("aria-expanded","true");}});})();
+document.addEventListener("click",function(e){var p=$("#notifPanel");if(!p||!p.classList.contains("open"))return;if(e.target.closest("#notifPanel")||e.target.closest("#notifBtn"))return;closeNotif();});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closeNotif();});
+/* Tıklanabilir KPI kartları — klavye desteği */
+$("#admin").addEventListener("keydown",function(e){if(e.key!=="Enter"&&e.key!==" ")return;var k=e.target.closest(".kpi.clk[data-go]");if(!k)return;e.preventDefault();muhAy=null;go(k.getAttribute("data-go"));});
 $("#viewSite").addEventListener("click",showSite);
 var _lo=$("#logoutBtn");if(_lo)_lo.addEventListener("click",adminLogout);
 
