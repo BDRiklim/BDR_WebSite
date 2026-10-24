@@ -1035,6 +1035,7 @@ var FATURA_DURUM=["Taslak","Bekliyor","Ödendi","İptal"];
 var TRASH='<path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>';
 var ARCHIVE='<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/><path d="M10 12h4"/>';
 var UNARCH='<path d="M3 7v6h6"/><path d="M3.5 13a9 9 0 1 0 2.1-9.4L3 7"/>';
+var ALERT='<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>';
 function mapHareket(r){return {id:r.id,tarih:r.tarih||null,a:r.aciklama||"",tip:r.tip||"Gelir",v:+r.tutar||0,y:(r.tip==="Gider"?-1:1)};}
 function mapFatura(r){return {id:r.id,no:r.no||"",m:r.mus||"",v:+r.tutar||0,kdv:+r.kdv||0,d:r.durum||"Taslak"};}
 function aylikGelir(){var now=new Date(),labels=[],sums=[],keys=[],ay=["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"],idx={};for(var i=7;i>=0;i--){var d=new Date(now.getFullYear(),now.getMonth()-i,1);var k=d.getFullYear()+"-"+d.getMonth();idx[k]=labels.length;labels.push(ay[d.getMonth()]);keys.push({y:d.getFullYear(),m:d.getMonth()});sums.push(0);}hareketler.forEach(function(h){if(h.y>0&&h.tarih){var dt=parseDOnly(h.tarih)||new Date(h.tarih);var kk=dt.getFullYear()+"-"+dt.getMonth();if(idx[kk]!==undefined)sums[idx[kk]]+=h.v;}});return {data:sums.map(function(x){return Math.round(x/1000);}),labels:labels,keys:keys};}
@@ -1134,8 +1135,25 @@ function talepFiltered(){return C.talepler.filter(function(t){return talepFilter
 function talepRows(){var arr=talepFiltered();if(!arr.length)return '<tr><td colspan="8" style="padding:18px"><span class="mut">'+(talepFilter==="arsiv"?"Arşivde talep yok.":"Bu durumda talep yok.")+'</span></td></tr>';return arr.map(function(t){var arsBtn=t.arsiv?'<button class="iconbtn" title="Arşivden çıkar" data-talarch="'+t.id+'">'+ic(UNARCH)+'</button>':'<button class="iconbtn" title="Arşivle" data-talarch="'+t.id+'">'+ic(ARCHIVE)+'</button>';return '<tr'+(t.arsiv?' class="tr-ars"':'')+'><td class="cust">'+t.ad+'<div class="sub2 tnum">'+t.tel+'</div></td><td>'+t.hiz+'</td><td>'+t.ilce+'</td><td class="sub2">'+t.kaynak+'</td><td class="tnum">'+t.t+'</td><td class="tnum">'+(t.tutar?TL(t.tutar):"—")+'</td><td><select class="statusel" data-id="'+t.id+'">'+DURUMLAR.map(function(d){return '<option'+(d===t.durum?' selected':'')+'>'+d+'</option>';}).join("")+'</select></td><td><div style="display:flex;gap:6px"><button class="iconbtn" title="WhatsApp mesajı gönder" data-wa="t:'+t.id+'" style="color:#1F9D62">'+WA_ICON+'</button><button class="iconbtn" title="Teklif oluştur (PDF)" data-teklif="'+t.id+'">'+ic(I.cms)+'</button>'+arsBtn+'<button class="iconbtn" title="Sil" data-talx="'+t.id+'" style="color:var(--bad)">'+ic(TRASH)+'</button></div></td></tr>';}).join("");}
 function refreshTalep(){var fb=$("#talepFilters");if(fb)fb.innerHTML=talepFilterBar();var tb=$("#talepBody");if(tb)tb.innerHTML=talepRows();}
 
-V.mesajlar=function(){return '<div class="apanel"><div class="tablewrap"><table><thead><tr><th>Durum</th><th>Gönderen</th><th>Konu</th><th>Mesaj</th><th>Tarih</th><th></th></tr></thead><tbody id="msgBody">'+msgRows()+'</tbody></table></div></div>';};
-function msgRows(){return C.mesajlar.map(function(m){return '<tr style="'+(m.okundu?"":"font-weight:600")+'"><td>'+(m.okundu?pill("Okundu","p-neutral"):pill("Yeni","p-info"))+'</td><td class="cust">'+m.ad+'<div class="sub2 tnum">'+m.tel+'</div></td><td>'+m.konu+'</td><td class="sub2" style="white-space:normal;max-width:320px">'+m.msg+'</td><td class="tnum sub2">'+m.t+'</td><td><div style="display:flex;gap:6px"><button class="iconbtn" title="WhatsApp ile yanıtla" data-wa="m:'+m.id+'" style="color:#1F9D62">'+WA_ICON+'</button><button class="iconbtn" title="Okundu" data-read="'+m.id+'">'+ic(I.check)+'</button></div></td></tr>';}).join("");}
+V.mesajlar=function(){return '<div class="sec-head"><span class="note">'+ic(I.msg)+' Acil mesajları kırmızı ünlemle işaretleyin; mesajları arşivleyin (saklar) veya kalıcı silin. Acil ve okunmamışlar üste gelir.</span></div><div id="msgFilters">'+msgFilterBar()+'</div><div class="apanel"><div class="tablewrap"><table><thead><tr><th>Durum</th><th>Gönderen</th><th>Konu</th><th>Mesaj</th><th>Tarih</th><th></th></tr></thead><tbody id="msgBody">'+msgRows()+'</tbody></table></div></div>';};
+function msgFilterBar(){
+  var na=C.mesajlar.filter(function(m){return !m.arsiv;}),arsN=C.mesajlar.length-na.length;
+  var unreadN=na.filter(function(m){return !m.okundu;}).length,acilN=na.filter(function(m){return m.acil;}).length;
+  var chip=function(key,label,n){return '<button class="tfchip'+(msgFilter===key?' on':'')+'" data-msgf="'+key+'">'+label+'<span class="tfn">'+n+'</span></button>';};
+  return '<div class="tfbar">'+chip("all","Gelen kutusu",na.length)+chip("unread","Okunmamış",unreadN)+chip("acil","Acil",acilN)+chip("arsiv","Arşiv",arsN)+'</div>';
+}
+function msgFiltered(){
+  var arr=C.mesajlar.filter(function(m){
+    if(msgFilter==="arsiv")return m.arsiv;
+    if(m.arsiv)return false;
+    if(msgFilter==="unread")return !m.okundu;
+    if(msgFilter==="acil")return m.acil;
+    return true;
+  });
+  return arr.slice().sort(function(a,b){return (b.acil?1:0)-(a.acil?1:0)||(a.okundu?1:0)-(b.okundu?1:0);});
+}
+function msgRows(){var arr=msgFiltered();if(!arr.length)return '<tr><td colspan="6" style="padding:18px"><span class="mut">'+(msgFilter==="arsiv"?"Arşivde mesaj yok.":msgFilter==="acil"?"Acil işaretli mesaj yok.":msgFilter==="unread"?"Okunmamış mesaj yok.":"Mesaj yok.")+'</span></td></tr>';return arr.map(function(m){var durum=m.acil?pill("Acil","p-bad"):(m.okundu?pill("Okundu","p-neutral"):pill("Yeni","p-info"));var acilBtn='<button class="iconbtn" title="'+(m.acil?"Acil işaretini kaldır":"Acil olarak işaretle")+'" data-acil="'+m.id+'" style="color:'+(m.acil?"var(--bad)":"var(--muted)")+'">'+ic(ALERT)+'</button>';var arsBtn=m.arsiv?'<button class="iconbtn" title="Arşivden çıkar" data-msgarch="'+m.id+'">'+ic(UNARCH)+'</button>':'<button class="iconbtn" title="Arşivle" data-msgarch="'+m.id+'">'+ic(ARCHIVE)+'</button>';return '<tr'+(m.arsiv?' class="tr-ars"':'')+' style="'+(m.okundu||m.arsiv?"":"font-weight:600")+'"><td>'+durum+'</td><td class="cust">'+m.ad+'<div class="sub2 tnum">'+m.tel+'</div></td><td>'+m.konu+'</td><td class="sub2" style="white-space:normal;max-width:320px">'+m.msg+'</td><td class="tnum sub2">'+m.t+'</td><td><div style="display:flex;gap:6px">'+acilBtn+'<button class="iconbtn" title="WhatsApp ile yanıtla" data-wa="m:'+m.id+'" style="color:#1F9D62">'+WA_ICON+'</button><button class="iconbtn" title="Okundu" data-read="'+m.id+'">'+ic(I.check)+'</button>'+arsBtn+'<button class="iconbtn" title="Sil" data-msgx="'+m.id+'" style="color:var(--bad)">'+ic(TRASH)+'</button></div></td></tr>';}).join("");}
+function refreshMsg(){var fb=$("#msgFilters");if(fb)fb.innerHTML=msgFilterBar();var mb=$("#msgBody");if(mb)mb.innerHTML=msgRows();}
 
 V.site=function(){
   function f(l,id,val){return '<div class="fld"><label>'+l+'</label><input id="'+id+'" value="'+String(val).replace(/"/g,"&quot;")+'"></div>';}
@@ -1217,12 +1235,12 @@ V.ayarlar=function(){var ay=C.ayarlar||{};var entg=[{ad:"WhatsApp (yarı-otomati
 function saveWaTpl(){function g(id){var e=$("#"+id);return e?e.value:"";}C.waTemplates={karsilama:g("wt_karsilama"),randevu:g("wt_randevu"),teklif:g("wt_teklif"),bakim:g("wt_bakim")};save();toast("WhatsApp şablonları kaydedildi");}
 
 /* nav + router */
-function buildNav(){var c=counts(),h="";NAV.forEach(function(g){var gi="";g.items.forEach(function(it){if(!roleCan(it[0]))return;var badge="";if(it[3]==="crm")badge='<span class="badge">'+(c.Yeni+c["Arandı"])+'</span>';if(it[3]==="msg")badge='<span class="badge">'+C.mesajlar.filter(function(m){return !m.okundu;}).length+'</span>';if(it[0]==="bakim"){var bhc=bakimHatirlatmalar().length;if(bhc)badge='<span class="badge">'+bhc+'</span>';}gi+='<button class="navlink" data-view="'+it[0]+'">'+ic(it[2])+'<span>'+it[1]+'</span>'+badge+'</button>';});if(gi)h+='<div class="navgrp"><div class="lbl">'+g.grp+'</div>'+gi+'</div>';});$("#nav").innerHTML=h;renderNotif();}
+function buildNav(){var c=counts(),h="";NAV.forEach(function(g){var gi="";g.items.forEach(function(it){if(!roleCan(it[0]))return;var badge="";if(it[3]==="crm")badge='<span class="badge">'+(c.Yeni+c["Arandı"])+'</span>';if(it[3]==="msg")badge='<span class="badge">'+C.mesajlar.filter(function(m){return !m.okundu&&!m.arsiv;}).length+'</span>';if(it[0]==="bakim"){var bhc=bakimHatirlatmalar().length;if(bhc)badge='<span class="badge">'+bhc+'</span>';}gi+='<button class="navlink" data-view="'+it[0]+'">'+ic(it[2])+'<span>'+it[1]+'</span>'+badge+'</button>';});if(gi)h+='<div class="navgrp"><div class="lbl">'+g.grp+'</div>'+gi+'</div>';});$("#nav").innerHTML=h;renderNotif();}
 function go(v){if(!V[v])v="dash";if(!roleCan(v))v="dash";curView=v;$$("#admin .navlink").forEach(function(n){n.classList.toggle("active",n.getAttribute("data-view")===v);});$("#pgTitle").textContent=TITLES[v][0];$("#pgSub").textContent=TITLES[v][1];$("#acontent").innerHTML=V[v]();if(v==="dash"){var ag=aylikGelir();var r=$("#rev1");r.innerHTML=barChart(ag.data,ag.labels);wireChart(r,ag.data);}if(v==="muhasebe"){wireMuhasebe();}if(v==="istatistik"){var zg=ziyaretGunluk(),rv=$("#vis1");if(rv){if(zg.data.reduce(function(a,b){return a+b;},0)>0){rv.innerHTML=barChart(zg.data,zg.labels);wireVisit(rv,zg.data);}else{rv.innerHTML='<div style="padding:30px;text-align:center" class="mut">Henüz ziyaret verisi yok. Site ziyaret edildikçe burada görünür.</div>';}}}closeSide();closeNotif();$("#admin").scrollTop=0;}
 
 /* admin events */
 $("#admin").addEventListener("click",function(e){
-  var t=e.target.closest("[data-view],[data-go],[data-add],[data-remind],[data-read],[data-teklif],[data-tfilter],[data-talarch],[data-talx],[data-bx],[data-bi],[data-up],[data-pub],[data-refx],[data-wa],[data-watpl],[data-ayarsave],[data-adminsave],[data-rvadd],[data-rvx],[data-rvsave],[data-faqadd],[data-faqx],[data-faqsave],[data-stokadd],[data-stoke],[data-stokx],[data-urune],[data-urunx],[data-bakimadd],[data-bakime],[data-bakimx],[data-bakimwa],[data-muhgeri],[data-haradd],[data-hare],[data-harx],[data-fatadd],[data-fate],[data-fatx],[data-refpick],[data-refe],[data-refimg],[data-useradd],[data-usere],[data-userx]");
+  var t=e.target.closest("[data-view],[data-go],[data-add],[data-remind],[data-read],[data-msgf],[data-msgarch],[data-msgx],[data-acil],[data-teklif],[data-tfilter],[data-talarch],[data-talx],[data-bx],[data-bi],[data-up],[data-pub],[data-refx],[data-wa],[data-watpl],[data-ayarsave],[data-adminsave],[data-rvadd],[data-rvx],[data-rvsave],[data-faqadd],[data-faqx],[data-faqsave],[data-stokadd],[data-stoke],[data-stokx],[data-urune],[data-urunx],[data-bakimadd],[data-bakime],[data-bakimx],[data-bakimwa],[data-muhgeri],[data-haradd],[data-hare],[data-harx],[data-fatadd],[data-fate],[data-fatx],[data-refpick],[data-refe],[data-refimg],[data-useradd],[data-usere],[data-userx]");
   if(!t)return;
   if(t.hasAttribute("data-muhgeri")){muhAy=null;renderMuhasebe();return;}
   if(t.hasAttribute("data-view")){muhAy=null;return go(t.getAttribute("data-view"));}
@@ -1234,7 +1252,11 @@ $("#admin").addEventListener("click",function(e){
   if(t.hasAttribute("data-refpick")){refMode={type:"new"};var fp=$("#refFile");if(fp)fp.click();return;}
   if(t.hasAttribute("data-refimg")){refMode={type:"replace",i:+t.getAttribute("data-refimg")};var fp2=$("#refFile");if(fp2)fp2.click();return;}
   if(t.hasAttribute("data-refe")){var ri=+t.getAttribute("data-refe");var rr=C.references[ri];if(!rr)return;openForm("Referans düzenle",[{label:"Proje adı",id:"r_ad",type:"input",value:rr.ad},{label:"Tür",id:"r_tur",type:"input",value:rr.tur},{label:"Konum / İlçe",id:"r_yer",type:"input",value:rr.yer}],function(){rr.ad=val("r_ad")||rr.ad;rr.tur=val("r_tur")||"—";rr.yer=val("r_yer")||"—";save();applyContent();go("galeri");toast("Referans güncellendi");});return;}
-  if(t.hasAttribute("data-read")){var id=+t.getAttribute("data-read");C.mesajlar.forEach(function(m){if(m.id===id)m.okundu=true;});if(sb)sb.from("mesajlar").update({okundu:true}).eq("id",id).then(function(r){if(r&&r.error)console.warn(r.error.message);});$("#msgBody").innerHTML=msgRows();buildNav();toast("Mesaj okundu işaretlendi");return;}
+  if(t.hasAttribute("data-read")){var id=+t.getAttribute("data-read");C.mesajlar.forEach(function(m){if(m.id===id)m.okundu=true;});if(sb)sb.from("mesajlar").update({okundu:true}).eq("id",id).then(function(r){if(r&&r.error)console.warn(r.error.message);});refreshMsg();buildNav();toast("Mesaj okundu işaretlendi");return;}
+  if(t.hasAttribute("data-msgf")){msgFilter=t.getAttribute("data-msgf");refreshMsg();return;}
+  if(t.hasAttribute("data-acil")){var acid=+t.getAttribute("data-acil");var arec=null;C.mesajlar.forEach(function(m){if(m.id===acid){m.acil=!m.acil;arec=m;}});if(!arec)return;if(sb)sb.from("mesajlar").update({acil:arec.acil}).eq("id",acid).then(function(r){if(r&&r.error)console.warn(r.error.message);});refreshMsg();toast(arec.acil?"Mesaj acil olarak işaretlendi":"Acil işareti kaldırıldı");return;}
+  if(t.hasAttribute("data-msgarch")){var maid=+t.getAttribute("data-msgarch");var mrec=null;C.mesajlar.forEach(function(m){if(m.id===maid){m.arsiv=!m.arsiv;mrec=m;}});if(!mrec)return;if(sb)sb.from("mesajlar").update({arsiv:mrec.arsiv}).eq("id",maid).then(function(r){if(r&&r.error)console.warn(r.error.message);});refreshMsg();buildNav();toast(mrec.arsiv?"Mesaj arşivlendi":"Mesaj arşivden çıkarıldı");return;}
+  if(t.hasAttribute("data-msgx")){var mxid=+t.getAttribute("data-msgx");var xmrec=C.mesajlar.filter(function(m){return m.id===mxid;})[0];if(!confirm((xmrec?xmrec.ad+" ":"")+"mesajını kalıcı olarak silmek istiyor musunuz?\n\nBu işlem geri alınamaz. Kaydı saklamak için \"Arşivle\"yi kullanabilirsiniz."))return;C.mesajlar=C.mesajlar.filter(function(m){return m.id!==mxid;});if(sb)sb.from("mesajlar").delete().eq("id",mxid).then(function(r){if(r&&r.error)console.warn(r.error.message);});refreshMsg();buildNav();toast("Mesaj silindi");return;}
   if(t.hasAttribute("data-teklif")){openTeklif(+t.getAttribute("data-teklif"));return;}
   if(t.hasAttribute("data-tfilter")){talepFilter=t.getAttribute("data-tfilter");refreshTalep();return;}
   if(t.hasAttribute("data-talarch")){var taid=+t.getAttribute("data-talarch");var trec=null;C.talepler.forEach(function(x){if(x.id===taid){x.arsiv=!x.arsiv;trec=x;}});if(!trec)return;if(sb)sb.from("talepler").update({arsiv:trec.arsiv}).eq("id",taid).then(function(r){if(r&&r.error)console.warn(r.error.message);});refreshTalep();buildNav();toast(trec.arsiv?"Talep arşivlendi":"Talep arşivden çıkarıldı");return;}
@@ -1344,7 +1366,7 @@ $("#scrim2").addEventListener("click",closeSide);
 /* ===== Bildirim merkezi ===== */
 function notifList(){
   var list=[];
-  if(roleCan("mesajlar")){var unread=C.mesajlar.filter(function(m){return !m.okundu;}).length;if(unread)list.push({icon:I.msg,title:unread+" yeni mesaj",sub:"Okunmamış iletişim mesajı",view:"mesajlar",lvl:"info"});}
+  if(roleCan("mesajlar")){var acilM=C.mesajlar.filter(function(m){return m.acil&&!m.arsiv;}).length;if(acilM)list.push({icon:I.msg,title:acilM+" acil mesaj",sub:"Acil işaretli, yanıt bekliyor",view:"mesajlar",lvl:"bad"});var unread=C.mesajlar.filter(function(m){return !m.okundu&&!m.arsiv;}).length;if(unread)list.push({icon:I.msg,title:unread+" yeni mesaj",sub:"Okunmamış iletişim mesajı",view:"mesajlar",lvl:"info"});}
   if(roleCan("talepler")){var c=counts();if(c.Yeni)list.push({icon:I.crm,title:c.Yeni+" yeni talep",sub:"Henüz aranmadı — takip gerekiyor",view:"talepler",lvl:"info"});}
   if(roleCan("bakim")){bakimHatirlatmalar().forEach(function(x){list.push({icon:I.wrench,title:(x.b.ad||"Bakım")+" · "+(x.b.cihaz||"cihaz"),sub:x.u.etiket,view:"bakim",lvl:(x.u.lvl==="w1"?"warn":"bad")});});}
   return list;
@@ -1366,10 +1388,10 @@ $("#viewSite").addEventListener("click",showSite);
 var _lo=$("#logoutBtn");if(_lo)_lo.addEventListener("click",adminLogout);
 
 /* ===== route site <-> admin ===== */
-var adminBuilt=false,curView="dash",rtSub=null,stokList=[],refMode=null,talepFilter="all";
+var adminBuilt=false,curView="dash",rtSub=null,stokList=[],refMode=null,talepFilter="all",msgFilter="all";
 function fmtDate(s){try{var d=new Date(s);return d.toLocaleDateString("tr-TR",{day:"2-digit",month:"short"})+" "+d.toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});}catch(e){return s||"";}}
 function mapTalep(r){return {id:r.id,ad:r.ad,tel:r.tel||"—",hiz:r.hizmet||"—",ilce:r.ilce||"—",t:fmtDate(r.created_at),durum:r.durum||"Yeni",tutar:+r.tutar||0,kaynak:r.kaynak||"—",mesaj:r.mesaj||"",arsiv:!!r.arsiv};}
-function mapMesaj(r){return {id:r.id,ad:r.ad,tel:r.tel||"—",konu:r.konu||"—",msg:r.mesaj||"",t:fmtDate(r.created_at),okundu:!!r.okundu};}
+function mapMesaj(r){return {id:r.id,ad:r.ad,tel:r.tel||"—",konu:r.konu||"—",msg:r.mesaj||"",t:fmtDate(r.created_at),okundu:!!r.okundu,arsiv:!!r.arsiv,acil:!!r.acil};}
 function loadData(){
   if(!sb)return Promise.resolve();
   return Promise.all([
