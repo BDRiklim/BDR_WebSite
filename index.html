@@ -172,8 +172,8 @@ header.nav .icon-btn:hover{border-color:#fff;color:#fff}
 .vcta .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
 .gal{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:170px;gap:12px;margin-top:40px}
 .gal a{border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--line);position:relative;display:block}
-.gal img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
-.gal a:hover img{transform:scale(1.06)}
+.gal img{width:100%;height:100%;object-fit:cover;transform:scale(var(--gz,1));transition:transform .5s}
+.gal a:hover img{transform:scale(calc(var(--gz,1)*1.06))}
 .gal .big{grid-column:span 2;grid-row:span 2}
 .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:44px}
 .step{padding:26px 22px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);position:relative}
@@ -919,9 +919,12 @@ function renderMarquee(){
   var one=on.map(function(b){return '<span class="bn">'+b.ad+'</span>';}).join("");
   $("#btrack").innerHTML=one+one;
 }
+function fitVals(x){var f=(x&&x.fit)||{};return {x:(f.x==null?50:f.x),y:(f.y==null?50:f.y),z:(f.z==null?1:f.z)};}
+function fitStyle(x){var f=fitVals(x);return 'object-position:'+f.x+'% '+f.y+'%;transform-origin:'+f.x+'% '+f.y+'%;--gz:'+f.z;}
+function fitStyleRaw(x){var f=fitVals(x);return 'object-fit:cover;object-position:'+f.x+'% '+f.y+'%;transform:scale('+f.z+');transform-origin:'+f.x+'% '+f.y+'%';}
 function renderGallery(){
   var r=C.references;
-  $("#galGrid").innerHTML=r.map(function(x,i){return '<a'+(i===0?' class="big"':'')+'><img src="'+x.img+'" alt="'+x.ad+' — BDR İklimlendirme referansı"></a>';}).join("");
+  $("#galGrid").innerHTML=r.map(function(x,i){return '<a'+(i===0?' class="big"':'')+'><img src="'+x.img+'" alt="'+x.ad+' — BDR İklimlendirme referansı" style="'+fitStyle(x)+'"></a>';}).join("");
 }
 function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 function renderReviews(){
@@ -1190,7 +1193,38 @@ function urunCards(){if(!C.products||!C.products.length)return '<div class="apan
 V.galeri=function(){return '<div class="sec-head"><span class="note">'+ic(I.gal)+' Eklediğiniz referanslar sitedeki galeride anında görünür.</span><div class="sp"></div><button class="asmbtn primary" data-refpick="new">'+ic(I.plus)+' Yeni referans (görsel yükle)</button></div><input type="file" id="refFile" accept="image/*" style="display:none"><div class="dropzone" data-refpick="new" style="margin-bottom:16px;cursor:pointer">'+ic(I.gal)+'<div style="margin-top:8px">Montaj fotoğrafı yüklemek için <b>buraya tıklayın</b></div></div><div class="cardgrid" id="refGrid">'+refCards()+'</div>';};
 var TR_AY_KISA=["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
 function refTarihSimdi(){var d=new Date();return TR_AY_KISA[d.getMonth()]+" "+d.getFullYear();}
-function refCards(){if(!C.references||!C.references.length)return '<div class="apanel"><div class="pb"><span class="mut">Henüz referans yok. "Yeni referans" ile görsel yükleyin.</span></div></div>';return C.references.map(function(r,i){return '<div class="pcard"><div class="im"><img src="'+r.img+'" alt=""></div><div class="bd"><div style="display:flex;align-items:center"><h4>'+esc(r.ad)+'</h4><span style="flex:1"></span><span class="sub2">'+esc(r.t)+'</span></div><div class="meta">'+esc(r.tur)+' · '+esc(r.yer)+'</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"><button class="asmbtn line asmbtn-sm" data-refe="'+i+'">'+ic(I.edit)+' Düzenle</button><button class="asmbtn line asmbtn-sm" data-refimg="'+i+'">Görsel değiştir</button><button class="asmbtn line asmbtn-sm" data-refx="'+i+'" style="color:var(--bad)">Sil</button></div></div></div>';}).join("");}
+function refCards(){if(!C.references||!C.references.length)return '<div class="apanel"><div class="pb"><span class="mut">Henüz referans yok. "Yeni referans" ile görsel yükleyin.</span></div></div>';return C.references.map(function(r,i){return '<div class="pcard"><div class="im" style="overflow:hidden"><img src="'+r.img+'" alt="" style="'+fitStyleRaw(r)+'"></div><div class="bd"><div style="display:flex;align-items:center"><h4>'+esc(r.ad)+'</h4><span style="flex:1"></span><span class="sub2">'+esc(r.t)+'</span></div><div class="meta">'+esc(r.tur)+' · '+esc(r.yer)+'</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"><button class="asmbtn line asmbtn-sm" data-refe="'+i+'">'+ic(I.edit)+' Düzenle</button><button class="asmbtn line asmbtn-sm" data-reffit="'+i+'">'+ic(I.gal)+' Kırp / Konumla</button><button class="asmbtn line asmbtn-sm" data-refimg="'+i+'">Görsel değiştir</button><button class="asmbtn line asmbtn-sm" data-refx="'+i+'" style="color:var(--bad)">Sil</button></div></div></div>';}).join("");}
+function openFrameEditor(i){
+  var r=C.references&&C.references[i]; if(!r)return;
+  var f=fitVals(r), st={x:f.x,y:f.y,z:f.z};
+  var ov=document.getElementById("frOv"); if(ov&&ov.parentNode)ov.parentNode.removeChild(ov);
+  ov=document.createElement("div"); ov.id="frOv";
+  ov.style.cssText="position:fixed;inset:0;background:rgba(10,18,30,.55);display:flex;align-items:center;justify-content:center;z-index:140;padding:16px";
+  ov.innerHTML='<div style="background:#fff;border-radius:16px;max-width:440px;width:100%;box-shadow:0 24px 60px -24px rgba(0,0,0,.55);overflow:hidden;font-family:inherit;color:#0E1B2E">'
+   +'<div style="display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid #E3E9F2"><b style="font-size:1.02rem">Görseli kırp / konumla</b><span style="flex:1"></span><button id="frX" style="border:none;background:none;font-size:1.5rem;color:#5E6E86;cursor:pointer;line-height:1">&times;</button></div>'
+   +'<div style="padding:18px">'
+   +'<div id="frFrame" style="position:relative;width:100%;aspect-ratio:16/10;border-radius:12px;overflow:hidden;background:#0b1830;cursor:grab;user-select:none;touch-action:none"><img id="frImg" src="'+escA(r.img)+'" alt="" draggable="false" style="width:100%;height:100%;pointer-events:none;'+fitStyleRaw(r)+'"></div>'
+   +'<div style="font-size:.78rem;color:#5E6E86;margin-top:8px">Görseli <b>sürükleyerek</b> konumlandırın, kaydırıcıyla <b>yakınlaştırın</b>.</div>'
+   +'<div style="display:flex;align-items:center;gap:10px;margin-top:12px"><span style="font-size:.84rem;color:#2B3B54">Yakınlaştır</span><input id="frZoom" type="range" min="1" max="3" step="0.05" value="'+st.z+'" style="flex:1"></div>'
+   +'</div>'
+   +'<div style="padding:13px 18px;border-top:1px solid #E3E9F2;display:flex;justify-content:space-between;gap:10px"><button id="frReset" style="border:1px solid #E3E9F2;background:#fff;border-radius:9px;padding:.55em 1em;font-weight:600;cursor:pointer">Sıfırla</button><div style="display:flex;gap:10px"><button id="frCancel" style="border:1px solid #E3E9F2;background:#fff;border-radius:9px;padding:.55em 1em;font-weight:600;cursor:pointer">Vazgeç</button><button id="frSave" style="background:#1B56C4;color:#fff;border:none;border-radius:9px;padding:.6em 1.2em;font-weight:700;cursor:pointer">Kaydet</button></div></div>'
+   +'</div>';
+  document.body.appendChild(ov);
+  var img=ov.querySelector("#frImg"), frame=ov.querySelector("#frFrame"), zr=ov.querySelector("#frZoom");
+  function apply(){img.style.objectPosition=st.x+"% "+st.y+"%";img.style.transform="scale("+st.z+")";img.style.transformOrigin=st.x+"% "+st.y+"%";}
+  var drag=false,lx=0,ly=0;
+  frame.addEventListener("pointerdown",function(e){drag=true;lx=e.clientX;ly=e.clientY;try{frame.setPointerCapture(e.pointerId);}catch(_){}frame.style.cursor="grabbing";});
+  frame.addEventListener("pointermove",function(e){if(!drag)return;var rc=frame.getBoundingClientRect();st.x=Math.max(0,Math.min(100,st.x-(e.clientX-lx)/rc.width*100/st.z));st.y=Math.max(0,Math.min(100,st.y-(e.clientY-ly)/rc.height*100/st.z));lx=e.clientX;ly=e.clientY;apply();});
+  frame.addEventListener("pointerup",function(){drag=false;frame.style.cursor="grab";});
+  frame.addEventListener("pointercancel",function(){drag=false;frame.style.cursor="grab";});
+  zr.addEventListener("input",function(e){st.z=+e.target.value;apply();});
+  ov.querySelector("#frReset").addEventListener("click",function(){st.x=50;st.y=50;st.z=1;zr.value=1;apply();});
+  function close(){if(ov&&ov.parentNode)ov.parentNode.removeChild(ov);}
+  ov.querySelector("#frX").addEventListener("click",close);
+  ov.querySelector("#frCancel").addEventListener("click",close);
+  ov.addEventListener("click",function(e){if(e.target===ov)close();});
+  ov.querySelector("#frSave").addEventListener("click",function(){r.fit={x:Math.round(st.x),y:Math.round(st.y),z:Math.round(st.z*100)/100};save();applyContent();var rg=$("#refGrid");if(rg)rg.innerHTML=refCards();toast("Görsel çerçevesi kaydedildi — sitede güncellendi");close();});
+}
 
 function escA(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;");}
 function escT(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;");}
@@ -1262,6 +1296,7 @@ $("#admin").addEventListener("click",function(e){
   if(t.hasAttribute("data-refx")){var k=+t.getAttribute("data-refx");var rn=C.references[k].ad;C.references.splice(k,1);save();applyContent();$("#refGrid").innerHTML=refCards();toast(rn+" galeriden kaldırıldı");return;}
   if(t.hasAttribute("data-refpick")){refMode={type:"new"};var fp=$("#refFile");if(fp)fp.click();return;}
   if(t.hasAttribute("data-refimg")){refMode={type:"replace",i:+t.getAttribute("data-refimg")};var fp2=$("#refFile");if(fp2)fp2.click();return;}
+  if(t.hasAttribute("data-reffit")){openFrameEditor(+t.getAttribute("data-reffit"));return;}
   if(t.hasAttribute("data-refe")){var ri=+t.getAttribute("data-refe");var rr=C.references[ri];if(!rr)return;openForm("Referans düzenle",[{label:"Proje adı",id:"r_ad",type:"input",value:rr.ad},{label:"Tür",id:"r_tur",type:"input",value:rr.tur},{label:"Konum / İlçe",id:"r_yer",type:"input",value:rr.yer},{label:"Tarih (örn. Eki 2026)",id:"r_t",type:"input",value:rr.t||refTarihSimdi()}],function(){rr.ad=val("r_ad")||rr.ad;rr.tur=val("r_tur")||"—";rr.yer=val("r_yer")||"—";rr.t=val("r_t")||rr.t||refTarihSimdi();save();applyContent();go("galeri");toast("Referans güncellendi");});return;}
   if(t.hasAttribute("data-read")){var id=+t.getAttribute("data-read");C.mesajlar.forEach(function(m){if(m.id===id)m.okundu=true;});if(sb)sb.from("mesajlar").update({okundu:true}).eq("id",id).then(function(r){if(r&&r.error)console.warn(r.error.message);});refreshMsg();buildNav();toast("Mesaj okundu işaretlendi");return;}
   if(t.hasAttribute("data-msgf")){msgFilter=t.getAttribute("data-msgf");refreshMsg();return;}
