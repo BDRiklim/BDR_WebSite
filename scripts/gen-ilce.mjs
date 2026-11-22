@@ -93,7 +93,12 @@ const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>
 const stars = p => "★".repeat(p) + "☆".repeat(5-p);
 
 function extractStyles(html){
-  const blocks = html.match(/<style>[\s\S]*?<\/style>/g) || [];
+  // Sadece gerçek <style> bloklarını al (head + public body). İlk <script src=>'ten
+  // sonrası inline JS; oradaki teklif/yazdırma şablonunun <style>'ı (body{padding:40px})
+  // alınmamalı — yoksa ilçe sayfalarında kenar boşlukları oluşuyor.
+  const cut = html.indexOf('<script src=');
+  const head = cut >= 0 ? html.slice(0, cut) : html;
+  const blocks = head.match(/<style>[\s\S]*?<\/style>/g) || [];
   return blocks.join("\n");
 }
 
@@ -189,7 +194,7 @@ ${styles}
       <a href="#bakim">Servis & Bakım</a><a href="#galeri">Referanslar</a><a href="#iletisim">İletişim</a>
     </nav>
     <div class="nav-cta">
-      <a href="/" class="btn btn-outline hideSm">← Ana sayfa</a>
+      <a href="/" class="btn btn-light hideSm">← Ana sayfa</a>
       <a href="#iletisim" class="btn btn-primary hideSm">Teklif Al</a>
       <button class="icon-btn burger" id="burger" aria-label="Menü" aria-expanded="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     </div>
