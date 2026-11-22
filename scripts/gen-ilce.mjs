@@ -18,11 +18,11 @@ const GEO = { lat: 41.0028063, lng: 28.8045655 };
 /* ---- sabit içerik (index.html DEF ile aynı) ---- */
 const BRANDS = ["Daikin","Mitsubishi Electric","Bosch","LG","Samsung","Toshiba","Gree","Vaillant","Midea","Baymak"];
 const REFS = [
-  {ad:"Pınar İş Merkezi",img:"assets/rooftop.jpg",big:true},
-  {ad:"Mavi Market Zinciri",img:"assets/service.jpg"},
-  {ad:"Deniz Residence",img:"assets/minimal.jpg"},
-  {ad:"Mado Şube Montajı",img:"assets/service2.jpg"},
-  {ad:"Nur Cafe",img:"assets/indoor.jpg"}
+  {ad:"Pınar İş Merkezi",tur:"VRF Sistemi",yer:"Başakşehir",img:"assets/rooftop.jpg",big:true},
+  {ad:"Mavi Market Zinciri",tur:"Soğuk Oda",yer:"Küçükçekmece",img:"assets/service.jpg"},
+  {ad:"Deniz Residence",tur:"Split & Multi",yer:"Beylikdüzü",img:"assets/minimal.jpg"},
+  {ad:"Mado Şube Montajı",tur:"Klima",yer:"Avcılar",img:"assets/service2.jpg"},
+  {ad:"Nur Cafe",tur:"Havalandırma",yer:"Bağcılar",img:"assets/indoor.jpg"}
 ];
 const REVIEWS = [
   {ad:"Mehmet A.",ilce:"Küçükçekmece",puan:5,yorum:"Salon için klima montajını aynı gün yaptılar, çok temiz ve düzenli çalıştılar. Fiyat da konuştuğumuz gibiydi, sürpriz çıkmadı."},
@@ -107,7 +107,10 @@ function brandsTrack(){
   return row + row; // marquee için iki kez
 }
 function galleryHTML(){
-  return REFS.map(r=>`<a${r.big?' class="big"':''}><img src="${r.img}" alt="${esc(r.ad)} — BDR İklimlendirme referansı" loading="lazy"></a>`).join("");
+  return REFS.map((r,i)=>{
+    const meta=[r.tur,r.yer].filter(Boolean).join(" · ");
+    return `<button class="gcard" type="button" data-gi="${i}"><span class="gcard-img"><img src="${r.img}" alt="${esc(r.ad)} — BDR İklimlendirme referansı" loading="lazy"></span><span class="gcard-cap"><b>${esc(r.ad)}</b><small>${esc(meta)}</small><span class="gcard-more">Detayı gör →</span></span></button>`;
+  }).join("");
 }
 function reviewsHTML(){
   return REVIEWS.map(r=>`<div class="rev"><div class="stars" aria-label="${r.puan} yıldız">${stars(r.puan)}</div><p>${esc(r.yorum)}</p><div class="who"><div class="av">${esc(r.ad.charAt(0))}</div><div><b>${esc(r.ad)}</b><span>${esc(r.ilce)}</span></div></div></div>`).join("");
@@ -131,7 +134,7 @@ function buildPage(d, styles){
   const allChips = d.semtler.map(s=>`<span>${esc(s)} klima</span>`).join("");
   const defEmbed = JSON.stringify({
     brands: BRANDS.map(ad=>({ad,on:true})),
-    references: REFS.map(r=>({ad:r.ad,img:r.img})),
+    references: REFS.map(r=>({ad:r.ad,tur:r.tur,yer:r.yer,img:r.img})),
     reviews: REVIEWS,
     faqs: FAQS,
     contact: {phone:PHONE,phoneRaw:PHONE_RAW,email:EMAIL,address:ADDR,hours:"Haftanın 7 günü · 24 saat açık",whatsapp:PHONE_RAW},
@@ -364,17 +367,30 @@ ${styles}
   var $=function(s){return document.querySelector(s);};
   var $$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s));};
   function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+  function escA(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;");}
   function setText(sel,t){$$(sel).forEach(function(e){e.textContent=t;});}
   /* paylaşılan içerik (panelden gelen) — statik içeriğin üstüne biner */
   var C=${defEmbed};
   function applyShared(){
     if(C.brands&&C.brands.length){var on=C.brands.filter(function(b){return b.on!==false;});var one=on.map(function(b){return '<span class="bn">'+esc(b.ad)+'</span>';}).join("");var bt=$("#btrack");if(bt&&one)bt.innerHTML=one+one;}
-    if(C.references&&C.references.length){var g=$("#galGrid");if(g)g.innerHTML=C.references.map(function(x,i){var f=x.fit||{},fx=(f.x==null?50:f.x),fy=(f.y==null?50:f.y),fz=(f.z==null?1:f.z);return '<a'+(i===0?' class="big"':'')+'><img src="'+esc(x.img)+'" alt="'+esc(x.ad)+' — BDR İklimlendirme referansı" loading="lazy" style="object-position:'+fx+'% '+fy+'%;transform-origin:'+fx+'% '+fy+'%;--gz:'+fz+'"></a>';}).join("");}
+    if(C.references&&C.references.length){var g=$("#galGrid");if(g)g.innerHTML=C.references.map(function(x,i){var f=x.fit||{},fx=(f.x==null?50:f.x),fy=(f.y==null?50:f.y),fz=(f.z==null?1:f.z);var meta=[x.tur,x.yer].filter(Boolean).join(" · ");var kisa=x.kisa||meta;return '<button class="gcard" type="button" data-gi="'+i+'"><span class="gcard-img"><img src="'+esc(x.img)+'" alt="'+esc(x.ad)+' — BDR İklimlendirme referansı" loading="lazy" style="object-position:'+fx+'% '+fy+'%;transform-origin:'+fx+'% '+fy+'%;--gz:'+fz+'"></span><span class="gcard-cap"><b>'+esc(x.ad)+'</b><small>'+esc(kisa)+'</small><span class="gcard-more">Detayı gör →</span></span></button>';}).join("");}
     if(C.reviews&&C.reviews.length){var rg=$("#reviewGrid");if(rg)rg.innerHTML=C.reviews.map(function(r){var p=Math.max(0,Math.min(5,+r.puan||5)),st="";for(var i=0;i<5;i++)st+=(i<p?"★":"☆");return '<div class="rev"><div class="stars" aria-label="'+p+' yıldız">'+st+'</div><p>'+esc(r.yorum)+'</p><div class="who"><div class="av">'+esc((r.ad||"?").charAt(0).toUpperCase())+'</div><div><b>'+esc(r.ad)+'</b><span>'+esc(r.ilce)+'</span></div></div></div>';}).join("");}
     if(C.faqs&&C.faqs.length){var fl=$("#faqList");if(fl)fl.innerHTML=C.faqs.map(function(f){return '<details class="faq"><summary>'+esc(f.s)+'</summary><div class="fa">'+esc(f.c)+'</div></details>';}).join("");}
     if(C.contact){var c=C.contact;if(c.phone)setText(".jsPhone",c.phone);if(c.phoneRaw)$$(".jsPhoneLink").forEach(function(a){a.setAttribute("href","tel:+"+c.phoneRaw);});if(c.email)setText(".jsEmail",c.email);if(c.address)setText(".jsAddr",c.address);if(c.hours)setText(".jsHours",c.hours);if(c.whatsapp)$$(".jsWa").forEach(function(a){a.setAttribute("href","https://wa.me/"+c.whatsapp);});}
     if(C.stats){if(C.stats.s1)setText(".jsStat1",C.stats.s1);if(C.stats.s2)setText(".jsStat2",C.stats.s2);if(C.stats.s3)setText(".jsStat3",C.stats.s3);}
   }
+  /* referans lightbox — karta tıklayınca uzun açıklama */
+  function openGalLight(r){
+    if(!r)return;
+    var f=r.fit||{},fx=(f.x==null?50:f.x),fy=(f.y==null?50:f.y),fz=(f.z==null?1:f.z);
+    var meta=[r.tur,r.yer,r.t].filter(Boolean).join(" · "), uzun=r.uzun||r.kisa||meta||"";
+    var ov=document.getElementById("galLight");
+    if(!ov){ov=document.createElement("div");ov.id="galLight";ov.className="glight";document.body.appendChild(ov);ov.addEventListener("click",function(e){if(e.target===ov||e.target.closest(".glight-x"))ov.classList.remove("open");});}
+    ov.innerHTML='<div class="glight-box"><button class="glight-x" aria-label="Kapat">&times;</button><div class="glight-img"><img src="'+escA(r.img)+'" alt="'+escA(r.ad)+'" style="object-position:'+fx+'% '+fy+'%;transform:scale('+fz+');transform-origin:'+fx+'% '+fy+'%"></div><div class="glight-body"><h3>'+esc(r.ad)+'</h3>'+(meta?'<div class="glight-meta">'+esc(meta)+'</div>':'')+'<p>'+esc(uzun)+'</p></div></div>';
+    ov.classList.add("open");
+  }
+  document.addEventListener("click",function(e){var c=e.target.closest&&e.target.closest("#galGrid .gcard");if(!c)return;var r=(C.references||[])[+c.getAttribute("data-gi")];if(r)openGalLight(r);});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"){var o=document.getElementById("galLight");if(o)o.classList.remove("open");}});
   /* panelden canlı içeriği çek, sonra uygula */
   if(sb){sb.from("site_icerik").select("data").eq("id",1).maybeSingle().then(function(r){if(r&&r.data&&r.data.data){var d=r.data.data;for(var k in d){if(Object.prototype.hasOwnProperty.call(d,k))C[k]=d[k];}}applyShared();}).catch(function(){});}
   /* burger */

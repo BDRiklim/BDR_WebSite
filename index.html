@@ -170,11 +170,30 @@ header.nav .icon-btn:hover{border-color:#fff;color:#fff}
 .vcta h2{color:#fff;font-size:clamp(1.6rem,3.2vw,2.3rem);margin-top:13px}
 .vcta p{color:rgba(255,255,255,.82);margin-top:14px;font-size:1.03rem;max-width:48ch}
 .vcta .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
-.gal{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:170px;gap:12px;margin-top:40px}
-.gal a{border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--line);position:relative;display:block}
-.gal img{width:100%;height:100%;object-fit:cover;transform:scale(var(--gz,1));transition:transform .5s}
-.gal a:hover img{transform:scale(calc(var(--gz,1)*1.06))}
-.gal .big{grid-column:span 2;grid-row:span 2}
+.gal{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;margin-top:40px;padding-bottom:14px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.gal::-webkit-scrollbar{height:8px}
+.gal::-webkit-scrollbar-track{background:transparent}
+.gal::-webkit-scrollbar-thumb{background:var(--line);border-radius:999px}
+.gcard{flex:0 0 300px;scroll-snap-align:start;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;text-align:left;padding:0;font:inherit;color:inherit;display:flex;flex-direction:column;transition:border-color .2s,transform .2s}
+.gcard:hover{border-color:color-mix(in srgb,var(--brand) 45%,var(--line));transform:translateY(-3px)}
+.gcard .gcard-img{display:block;height:200px;overflow:hidden}
+.gcard .gcard-img img{width:100%;height:100%;object-fit:cover;transform:scale(var(--gz,1));transition:transform .4s}
+.gcard:hover .gcard-img img{transform:scale(calc(var(--gz,1)*1.05))}
+.gcard .gcard-cap{padding:13px 15px}
+.gcard .gcard-cap b{font-family:var(--display);font-size:1rem;display:block;line-height:1.3}
+.gcard .gcard-cap small{color:var(--muted);font-size:.85rem;display:block;margin-top:3px}
+.gcard .gcard-more{color:var(--brand);font-size:.76rem;font-weight:700;margin-top:9px;display:inline-block}
+.glight{position:fixed;inset:0;background:rgba(10,18,30,.72);display:none;align-items:center;justify-content:center;z-index:140;padding:18px;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.glight.open{display:flex}
+.glight-box{background:var(--surface);border-radius:18px;max-width:560px;width:100%;max-height:88vh;overflow:auto;box-shadow:var(--shadow);position:relative}
+.glight-x{position:absolute;top:12px;right:12px;width:36px;height:36px;border:none;background:rgba(255,255,255,.92);border-radius:50%;font-size:1.4rem;line-height:1;color:var(--ink);cursor:pointer;z-index:2;box-shadow:var(--shadow-sm)}
+.glight-img{height:300px;overflow:hidden;border-radius:18px 18px 0 0;background:#0b1830}
+.glight-img img{width:100%;height:100%;object-fit:cover}
+.glight-body{padding:20px 22px 24px}
+.glight-body h3{font-size:1.3rem}
+.glight-meta{color:var(--brand);font-size:.84rem;font-weight:600;margin-top:6px}
+.glight-body p{color:var(--ink-2);margin-top:12px;line-height:1.7;white-space:pre-line}
+@media(max-width:620px){.gcard{flex-basis:76vw}.glight-img{height:220px}}
 .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:44px}
 .step{padding:26px 22px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);position:relative}
 .step .n{font-size:1.5rem;font-weight:800;color:var(--brand);font-family:var(--display)}
@@ -923,9 +942,23 @@ function fitVals(x){var f=(x&&x.fit)||{};return {x:(f.x==null?50:f.x),y:(f.y==nu
 function fitStyle(x){var f=fitVals(x);return 'object-position:'+f.x+'% '+f.y+'%;transform-origin:'+f.x+'% '+f.y+'%;--gz:'+f.z;}
 function fitStyleRaw(x){var f=fitVals(x);return 'object-fit:cover;object-position:'+f.x+'% '+f.y+'%;transform:scale('+f.z+');transform-origin:'+f.x+'% '+f.y+'%';}
 function renderGallery(){
-  var r=C.references;
-  $("#galGrid").innerHTML=r.map(function(x,i){return '<a'+(i===0?' class="big"':'')+'><img src="'+x.img+'" alt="'+x.ad+' — BDR İklimlendirme referansı" style="'+fitStyle(x)+'"></a>';}).join("");
+  var r=C.references||[];
+  $("#galGrid").innerHTML=r.map(function(x,i){
+    var meta=[x.tur,x.yer].filter(Boolean).join(" · ");
+    var kisa=x.kisa||meta;
+    return '<button class="gcard" type="button" data-gi="'+i+'"><span class="gcard-img"><img src="'+x.img+'" alt="'+esc(x.ad)+' — BDR İklimlendirme referansı" style="'+fitStyle(x)+'"></span><span class="gcard-cap"><b>'+esc(x.ad)+'</b><small>'+esc(kisa)+'</small><span class="gcard-more">Detayı gör →</span></span></button>';
+  }).join("");
 }
+function openGalLight(r){
+  if(!r)return;
+  var f=fitVals(r), meta=[r.tur,r.yer,r.t].filter(Boolean).join(" · "), uzun=r.uzun||r.kisa||meta||"";
+  var ov=document.getElementById("galLight");
+  if(!ov){ov=document.createElement("div");ov.id="galLight";ov.className="glight";document.body.appendChild(ov);ov.addEventListener("click",function(e){if(e.target===ov||e.target.closest(".glight-x"))ov.classList.remove("open");});}
+  ov.innerHTML='<div class="glight-box"><button class="glight-x" aria-label="Kapat">&times;</button><div class="glight-img"><img src="'+escA(r.img)+'" alt="'+escA(r.ad)+'" style="object-position:'+f.x+'% '+f.y+'%;transform:scale('+f.z+');transform-origin:'+f.x+'% '+f.y+'%"></div><div class="glight-body"><h3>'+esc(r.ad)+'</h3>'+(meta?'<div class="glight-meta">'+esc(meta)+'</div>':'')+'<p>'+esc(uzun)+'</p></div></div>';
+  ov.classList.add("open");
+}
+document.addEventListener("click",function(e){var c=e.target.closest&&e.target.closest("#galGrid .gcard");if(!c)return;var r=(C.references||[])[+c.getAttribute("data-gi")];if(r)openGalLight(r);});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){var o=document.getElementById("galLight");if(o)o.classList.remove("open");}});
 function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 function renderReviews(){
   var el=$("#reviewGrid"); if(!el)return;
@@ -1297,7 +1330,7 @@ $("#admin").addEventListener("click",function(e){
   if(t.hasAttribute("data-refpick")){refMode={type:"new"};var fp=$("#refFile");if(fp)fp.click();return;}
   if(t.hasAttribute("data-refimg")){refMode={type:"replace",i:+t.getAttribute("data-refimg")};var fp2=$("#refFile");if(fp2)fp2.click();return;}
   if(t.hasAttribute("data-reffit")){openFrameEditor(+t.getAttribute("data-reffit"));return;}
-  if(t.hasAttribute("data-refe")){var ri=+t.getAttribute("data-refe");var rr=C.references[ri];if(!rr)return;openForm("Referans düzenle",[{label:"Proje adı",id:"r_ad",type:"input",value:rr.ad},{label:"Tür",id:"r_tur",type:"input",value:rr.tur},{label:"Konum / İlçe",id:"r_yer",type:"input",value:rr.yer},{label:"Tarih (örn. Eki 2026)",id:"r_t",type:"input",value:rr.t||refTarihSimdi()}],function(){rr.ad=val("r_ad")||rr.ad;rr.tur=val("r_tur")||"—";rr.yer=val("r_yer")||"—";rr.t=val("r_t")||rr.t||refTarihSimdi();save();applyContent();go("galeri");toast("Referans güncellendi");});return;}
+  if(t.hasAttribute("data-refe")){var ri=+t.getAttribute("data-refe");var rr=C.references[ri];if(!rr)return;openForm("Referans düzenle",[{label:"Proje adı",id:"r_ad",type:"input",value:rr.ad},{label:"Tür",id:"r_tur",type:"input",value:rr.tur},{label:"Konum / İlçe",id:"r_yer",type:"input",value:rr.yer},{label:"Tarih (örn. Eki 2026)",id:"r_t",type:"input",value:rr.t||refTarihSimdi()},{label:"Kısa bilgi (kartın altında görünür)",id:"r_kisa",type:"input",value:rr.kisa||""},{label:"Uzun açıklama (karta tıklayınca açılır)",id:"r_uzun",type:"textarea",value:rr.uzun||""}],function(){rr.ad=val("r_ad")||rr.ad;rr.tur=val("r_tur")||"—";rr.yer=val("r_yer")||"—";rr.t=val("r_t")||rr.t||refTarihSimdi();rr.kisa=val("r_kisa");rr.uzun=val("r_uzun");save();applyContent();go("galeri");toast("Referans güncellendi");});return;}
   if(t.hasAttribute("data-read")){var id=+t.getAttribute("data-read");C.mesajlar.forEach(function(m){if(m.id===id)m.okundu=true;});if(sb)sb.from("mesajlar").update({okundu:true}).eq("id",id).then(function(r){if(r&&r.error)console.warn(r.error.message);});refreshMsg();buildNav();toast("Mesaj okundu işaretlendi");return;}
   if(t.hasAttribute("data-msgf")){msgFilter=t.getAttribute("data-msgf");refreshMsg();return;}
   if(t.hasAttribute("data-acil")){var acid=+t.getAttribute("data-acil");var arec=null;C.mesajlar.forEach(function(m){if(m.id===acid){m.acil=!m.acil;arec=m;}});if(!arec)return;if(sb)sb.from("mesajlar").update({acil:arec.acil}).eq("id",acid).then(function(r){if(r&&r.error)console.warn(r.error.message);});refreshMsg();toast(arec.acil?"Mesaj acil olarak işaretlendi":"Acil işareti kaldırıldı");return;}
