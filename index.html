@@ -1285,7 +1285,7 @@ function go(v){if(!V[v])v="dash";if(!roleCan(v))v="dash";curView=v;$$("#admin .n
 
 /* admin events */
 $("#admin").addEventListener("click",function(e){
-  var t=e.target.closest("[data-view],[data-go],[data-add],[data-remind],[data-read],[data-msgf],[data-msgarch],[data-msgx],[data-acil],[data-teklif],[data-tfilter],[data-talarch],[data-talx],[data-bx],[data-bi],[data-up],[data-pub],[data-refx],[data-wa],[data-watpl],[data-ayarsave],[data-adminsave],[data-rvadd],[data-rvx],[data-rvsave],[data-faqadd],[data-faqx],[data-faqsave],[data-stokadd],[data-stoke],[data-stokx],[data-urune],[data-urunx],[data-urunimg],[data-bakimadd],[data-bakime],[data-bakimx],[data-bakimwa],[data-muhgeri],[data-haradd],[data-hare],[data-harx],[data-fatadd],[data-fate],[data-fatx],[data-refpick],[data-refe],[data-refimg],[data-useradd],[data-usere],[data-userx]");
+  var t=e.target.closest("[data-view],[data-go],[data-add],[data-remind],[data-read],[data-msgf],[data-msgarch],[data-msgx],[data-acil],[data-teklif],[data-tfilter],[data-talarch],[data-talx],[data-bx],[data-bi],[data-up],[data-pub],[data-refx],[data-wa],[data-watpl],[data-ayarsave],[data-adminsave],[data-rvadd],[data-rvx],[data-rvsave],[data-faqadd],[data-faqx],[data-faqsave],[data-stokadd],[data-stoke],[data-stokx],[data-urune],[data-urunx],[data-urunimg],[data-bakimadd],[data-bakime],[data-bakimx],[data-bakimwa],[data-muhgeri],[data-haradd],[data-hare],[data-harx],[data-fatadd],[data-fate],[data-fatx],[data-refpick],[data-refe],[data-refimg],[data-reffit],[data-useradd],[data-usere],[data-userx]");
   if(!t)return;
   if(t.hasAttribute("data-muhgeri")){muhAy=null;renderMuhasebe();return;}
   if(t.hasAttribute("data-view")){muhAy=null;return go(t.getAttribute("data-view"));}
